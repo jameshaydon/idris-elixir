@@ -1,0 +1,9 @@
+resolver: lts-9.18
+
+packages:
+- .
+
+extra-deps:
+  - idris-1.1.1
+  - binary-0.8.5.1
+  - cheapskate-0.1.1
