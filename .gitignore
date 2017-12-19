@@ -37,3 +37,5 @@ cabal.project.local
 *.ibc
 
 # End of https://www.gitignore.io/api/idris,elixir,haskell
+
+examples/play/*

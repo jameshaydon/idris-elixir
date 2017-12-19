@@ -1,7 +1,7 @@
 Name:           idris-elixir
 Version:        0.0.0.1
 License:        BSD3
-License-file:   LICENSE
+--License-file:   LICENSE
 Author:         James Haydon
 Maintainer:	James Haydon <james.haydon@gmail.com>
 Build-Type:	Simple
@@ -21,8 +21,10 @@ Executable idris-codegen-elixir
                 , haskeline >= 0.7
                 , mtl
                 , transformers
+                , text
 
   other-modules: IRTS.CodegenElixir
+               , Util.PrettyPrint
 
   if os(linux)
      cpp-options:   -DLINUX
