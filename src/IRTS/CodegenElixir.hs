@@ -1,4 +1,5 @@
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module IRTS.CodegenElixir(codegenElixir) where
 
@@ -152,15 +153,38 @@ defLambda (a:args) body =
 
 defFunction :: Doc -> [Doc] -> Doc -> Doc
 defFunction name args body =
-      text "#" <+> name
-  $+$ text "def " <> name <> text "(" <+> commaSeperated args <+> text ") do"
+     text "def " <> name <> text "(" <+> commaSeperated args <+> text ") do"
   -- $+$ indent (text "IO.puts \"in:" <+> name <> text "\"")
   $+$ indent body
   $+$ text "end"
 
-cgCon :: Doc -> [Doc] -> Doc
+-- UN-MkUnit
+
+cgCon :: Name -> [Doc] -> Doc
+-- Unit
+cgCon (UN "MkUnit") [] = text "{}"
+-- Idris booleans as Elixir booleans
+cgCon (NS (UN "True") ["Bool", "Prelude"]) [] = text "true"
+cgCon (NS (UN "False") ["Bool", "Prelude"]) [] = text "false"
+-- Idris pairs as Elixir tuples
+cgCon (NS (UN "MkPair") ["Builtins"]) [x, y] = text "{" <+> x <+> text "," <+> y <+> text "}"
+-- Idris listy-things as Elixir lists
+cgCon (NS (UN "Nil") _) [] = text "[]"
+cgCon (NS (UN "::") _) [x,y] = text "[" <+> x <+> text "|" <+> y <+> text "]"
+-- No argument constructor
+cgCon name [] = text ":" <> cgName name
+-- General constructor
 cgCon name args =
-  text "{" <> commaSeperated ((text ":" <> name) : args) <> text "}"
+  -- text "#" <+> text (showName name) $+$
+  text "{" <> commaSeperated ((text ":" <> cgName name) : args) <> text "}"
+
+-- showName :: Name -> String
+-- showName n = case n of
+--   UN t -> "UN (" ++ T.unpack t ++ ")"
+--   NS n' ts -> "NS (" ++ showName n' ++ ") (" ++ show (T.unpack <$> ts) ++ ")"
+--   MN i t -> "MN (" ++ show i ++ ") (" ++ T.unpack t ++ ")"
+--   SN sn -> "SN (" ++ show sn ++ ")"
+--   SymRef i -> "SymRef (" ++ show i ++ ")"
 
 elixirDef :: (Name, LDecl) -> State CGState Doc
 elixirDef (name, decl) = do
@@ -171,14 +195,14 @@ elixirDef (name, decl) = do
       let argNames = cgName <$> arguments
       (stmts, retV) <- cgBody body
       pure $
+        --     text ""
+        -- $+$ multiLineComment (show decl)
             text ""
-        $+$ multiLineComment (show decl)
-        $+$ text ""
-        $+$
-        defFunction
-          (cgName name)
-          argNames
-          (stmts $+$ retV)
+        $+$ text "#" <+> text (show name)
+        $+$ defFunction
+              (cgName name)
+              argNames
+              (stmts $+$ retV)
 
 cgAssign :: Doc -> Expr -> Stmts
 cgAssign v e = v <+> text "=" <+> e
@@ -267,7 +291,7 @@ cgBody body = case body of
   LCon _ _ n es -> do
     xs <- traverse cgBody es
     let ss = vcat $ fst <$> xs
-    pure (ss, cgCon (cgName n) (snd <$> xs))
+    pure (ss, cgCon n (snd <$> xs))
   LConst c -> pure (empty, cgConst c)
   LForeign{} -> pure (empty, text "UNIM FOREIGN")
   LOp prim args -> do
@@ -283,12 +307,12 @@ prepArg :: LExp -> State CGState (Stmts, Expr)
 prepArg (LV (Glob f)) = do
   ds_ <- getDefState f
   case ds_ of
-    Just ds -> case compare 1 (fullArity ds) of
-      EQ -> do
-        x <- fresh
-        pure (empty, text "fn (" <> cgVar x <> text ") -> " <> cgName f <> text "(" <> cgVar x <> text ") end")
-      LT -> pure (empty, text "ERROR UNIM")
-      GT -> pure (empty, text "ERROR UNIM")
+    Just ds -> pure
+      ( empty
+      , case fullArity ds of
+          0 -> cgName f <> text "()"
+          n -> text "&" <> cgName f <> text ("/" ++ show n)
+      )
     Nothing -> cgBody (LV (Glob f))
 prepArg x = cgBody x
 
@@ -296,7 +320,7 @@ cgAlt :: LAlt -> State CGState Expr
 cgAlt (LConCase _ n ns e) = do
   (ss, b) <- cgBody e
   pure $     --text "#" <+> text (show alt) $+$
-             cgCon (cgName n) (cgName <$> ns) <> text " ->"
+             cgCon n (cgName <$> ns) <> text " ->"
          $+$ indent (ss $+$ b)
 cgAlt alt@(LConstCase con e) = do
   let c = cgConst con
@@ -327,7 +351,7 @@ cgOp pf es =
       (as, LEq _)        -> bi as "=="
       ([e], LExternal _) -> e -- TODO: Not sure what this is
       ([_,s], LWriteStr) -> text "IO.puts(" <+> s <+> text ")"
-      ([i], LIntStr ITNative) -> text "to_string(" <+> i <+> text ")"
+      ([i], LIntStr _) -> text "to_string(" <+> i <+> text ")"
       ([i], LTrunc ITBig ITNative) -> i -- TODO ?
       ([i], LSExt ITNative ITBig) -> i -- TODO ?
       (as, LSLt _) -> bi as "<"
