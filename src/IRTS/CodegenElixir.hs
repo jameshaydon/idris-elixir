@@ -94,10 +94,13 @@ makePartials st =
     in vcat ps
   where
     hasPartials (_, DefState { partialsUsed }) = not $ S.null partialsUsed
+
     makePartialsFor (name, DefState { fullArity, partialsUsed }) =
       vcat [ makePartial (cgName name) fullArity numArgs | numArgs <- S.toList partialsUsed ]
-    givenArgs n = [ text "givenArg" <> text (show i) | i <- [0..(n - 1)]]
-    restArgs n = [ text "restArg" <> text (show i) | i <- [0..(n - 1)]]
+
+    givenArgs n = text <$> [ "givenArg" ++ show i | i <- [0..(n - 1)]]
+    restArgs  n = text <$> [ "restArg"  ++ show i | i <- [0..(n - 1)]]
+
     makePartial name full numArgs =
       let givens = givenArgs numArgs
           rest   = restArgs (full - numArgs)
@@ -108,13 +111,7 @@ makePartials st =
 
 helperModule :: Doc
 helperModule = vcat . fmap text $
-  [ "defmodule IdrisHelper do"
-  , "  def error(s) do"
-  , "    IO.puts (\"there was an error: \" <> s)"
-  , "  end"
-  , "end"
-  , ""
-  , "defmodule IdrisRts do"
+  [ "defmodule IdrisRts do"
   , "  def force(x) do"
   , "    case x do"
   , "      {:idris_lazy, _, val} -> val"
@@ -129,7 +126,7 @@ helperModule = vcat . fmap text $
 -- Let's not mangle /that/ much. Especially function parameters
 -- like e0 and e1 are nicer when readable.
 cgName :: Name -> Expr
-cgName (MN i n) | all (\x -> isAlpha x || x `elem` "_") (T.unpack n)
+cgName (MN i n) | all (\x -> isAlpha x || x == '_') (T.unpack n)
     = text $ T.unpack n ++ show i
 cgName n = text (elixirName n) -- <?> show n  -- uncomment this to get a comment for *every* mangled name
 
@@ -146,16 +143,19 @@ thunk body =
   $+$ text "end"
 
 defLambda :: [Doc] -> Doc -> Doc
-defLambda args body =
-      text "fn " <> text "(" <+> commaSeperated args <+> text ") ->"
-  $+$ indent (text "IO.puts \"in: anonymous\"" $+$ body)
+defLambda [] body = body
+defLambda (a:args) body =
+      text "fn " <> text "(" <+> a <+> text ") ->"
+  -- $+$ indent (text "IO.puts \"in: anonymous\"")
+  $+$ indent (defLambda args body)
   $+$ text "end"
 
 defFunction :: Doc -> [Doc] -> Doc -> Doc
 defFunction name args body =
       text "#" <+> name
   $+$ text "def " <> name <> text "(" <+> commaSeperated args <+> text ") do"
-  $+$ indent (text "IO.puts \"in:" <+> name <> text "\"" $+$ body)
+  -- $+$ indent (text "IO.puts \"in:" <+> name <> text "\"")
+  $+$ indent body
   $+$ text "end"
 
 cgCon :: Doc -> [Doc] -> Doc
@@ -179,8 +179,6 @@ elixirDef (name, decl) = do
           (cgName name)
           argNames
           (stmts $+$ retV)
-  -- where
-  --   args a = [text ("con_arg_" ++ show i) | i <- [0..(a - 1)]]
 
 cgAssign :: Doc -> Expr -> Stmts
 cgAssign v e = v <+> text "=" <+> e
@@ -192,13 +190,24 @@ defFunApp :: Doc -> [Doc] -> Doc
 defFunApp f xs = f <> text "(" <+> commaSeperated xs <+> text ")"
 
 fnApp :: Doc -> [Doc] -> Doc
-fnApp f [] = f <> text ".()"
-fnApp f [x] = f <> text ".(" <+> x <+> text ")"
+fnApp f []     = f <> text ".()"
+fnApp f [x]    = f <> text ".(" <+> x <+> text ")"
 fnApp f (x:xs) = fnApp (fnApp f [x]) xs
 
 cgBody :: LExp -> State CGState (Stmts, Expr)
 cgBody body = case body of
   LV v -> pure (empty, cgVar v)
+  LCase _ e@(LOp _ [_, _]) [LConstCase (I 0) whenFalse, LDefaultCase whenTrue] -> do
+    ifElseV <- fresh
+    (scrutStmts, scrut) <- cgBody e
+    (ffStmts, ff) <- cgBody whenFalse
+    (ttStmts, tt) <- cgBody whenTrue
+    let b =     text "if (" <+> scrut <+> text ") do"
+            $+$ indent (ttStmts $+$ tt)
+            $+$ text "else"
+            $+$ indent (ffStmts $+$ ff)
+            $+$ text "end"
+    pure (scrutStmts $+$ cgAssign (cgVar ifElseV) b, cgVar ifElseV)
   LCase _ e alts -> do
     scrutV <- fresh
     (scrutStmts, scrut) <- cgBody e
@@ -211,7 +220,7 @@ cgBody body = case body of
                 $+$ cgAssign (cgVar scrutV) scrut
                 $+$ cgAssign (cgVar caseVar) cbody
     pure (stmts, cgVar caseVar)
-  lapp@(LApp _ (LV (Glob f)) args) -> do
+  LApp _ (LV (Glob f)) args -> do
     ds_ <- getDefState f
     xs <- traverse prepArg args
     let stmts = vcat (fst <$> xs)
@@ -268,10 +277,6 @@ cgBody body = case body of
   LError s -> pure (empty, text ("\"ERROR: " ++ s ++ "\""))
   _ -> pure (empty, text "UNIM SOMETHING ELSE")
 
-betterShow :: LExp -> String
-betterShow (LApp _ f args) = "functionApplication{ func: " ++ show f ++ ", numArgs: " ++ show (length args) ++ ", args: " ++ show args ++ "}"
-betterShow x = show x
-
 -- | Arguments which are references to global functions need to be treated
 -- differently.
 prepArg :: LExp -> State CGState (Stmts, Expr)
@@ -293,11 +298,11 @@ cgAlt (LConCase _ n ns e) = do
   pure $     --text "#" <+> text (show alt) $+$
              cgCon (cgName n) (cgName <$> ns) <> text " ->"
          $+$ indent (ss $+$ b)
-cgAlt (LConstCase con e) = do
+cgAlt alt@(LConstCase con e) = do
   let c = cgConst con
   (ss, b) <- cgBody e
   pure $
-             --text "#" <+> text (show alt) $+$
+             --    text "#" <+> text (showConst con) $+$
              c <+> text "->"
          $+$ indent (ss $+$ b)
 cgAlt (LDefaultCase e) = do
@@ -305,6 +310,11 @@ cgAlt (LDefaultCase e) = do
   pure $
         text "_ ->"
     $+$ indent (ss $+$ b)
+
+showConst :: Const -> String
+showConst c@(I _) = "I - " ++ show c
+showConst c@(BI _) = "BI - " ++ show c
+showConst c = show c
 
 cgOp :: PrimFn -> [Doc] -> Doc
 cgOp pf es =
@@ -318,6 +328,10 @@ cgOp pf es =
       ([e], LExternal _) -> e -- TODO: Not sure what this is
       ([_,s], LWriteStr) -> text "IO.puts(" <+> s <+> text ")"
       ([i], LIntStr ITNative) -> text "to_string(" <+> i <+> text ")"
+      ([i], LTrunc ITBig ITNative) -> i -- TODO ?
+      ([i], LSExt ITNative ITBig) -> i -- TODO ?
+      (as, LSLt _) -> bi as "<"
+      (as, LSGt _) -> bi as ">"
       (_, op)           -> text $ "raise(\"UNIM PRIM OP NOT IMPLEMENTED: " ++ show op ++ "\")"
   where
     bi [x,y] sym = x <+> text sym <+> y
@@ -330,7 +344,7 @@ cgConst c = text $ case c of
   Fl d  -> show d
   Ch ch -> show ch
   Str s -> show s
-  _     -> "!UNIM! constant: " ++ show c
+  _     -> "raise(\"!UNIM! constant: " ++ show c ++ "\""
 
 elixirName :: Name -> String
 elixirName n = "i_" ++ concatMap elixirChar (show n)
@@ -352,5 +366,7 @@ elixirName n = "i_" ++ concatMap elixirChar (show n)
       '>' -> "_gt_"
       '!' -> "_bang_"
       '@' -> "_at_"
+      '+' -> "_plus_"
+      '#' -> "_hash_"
       c | isAlpha c || isDigit c -> [c]
         | otherwise              -> "_" ++ show (fromEnum x) ++ "_"

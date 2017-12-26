@@ -16,8 +16,6 @@ import IRTS.CodegenElixir
 import System.Environment
 import System.Exit
 
-import Paths_idris_elixir
-
 data Opts = Opts { inputs :: [FilePath],
                    output :: FilePath }
 
