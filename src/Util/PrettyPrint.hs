@@ -1,9 +1,5 @@
 {-# LANGUAGE TupleSections #-}
 
--- This module is equivalent to Text.PrettyPrint.
--- The only difference is slightly different indentation behaviour.
--- (Plus support of code comments).
-
 module Util.PrettyPrint
     ( Doc
     , int, text
@@ -22,7 +18,6 @@ module Util.PrettyPrint
     , removeEmptyLineWS
     )
     where
-
 
 type Line = (String, String)  -- text, comment
 newtype Doc = Doc [Line]
@@ -98,9 +93,9 @@ multiLineComment :: String -> Doc
 multiLineComment s = Doc $ ("",) <$> lines s
 
 renderLine :: String -> (String, String) -> String
-renderLine cmtStr ("", "") = ""
+renderLine _ ("", "") = ""
 renderLine cmtStr ("", comment) = cmtStr ++ " " ++ comment
-renderLine cmtStr (content, "") = content
+renderLine _ (content, "") = content
 renderLine cmtStr (content, comment) = content ++ "  " ++ cmtStr ++ " " ++ comment
 
 empty :: Doc
@@ -113,8 +108,8 @@ hsep :: [Doc] -> Doc
 hsep = foldr (<+>) empty
 
 punctuate :: Doc -> [Doc] -> [Doc]
-punctuate sep [] = []
-punctuate sep [x] = [x]
+punctuate _ []         = []
+punctuate _ [x]        = [x]
 punctuate sep (x : xs) = (x <> sep) : punctuate sep xs
 
 size :: Doc -> Int
@@ -126,5 +121,5 @@ width (Doc xs) = maximum [length t | (t, c) <- xs]
 removeEmptyLineWS :: Doc -> Doc
 removeEmptyLineWS (Doc ls) = Doc (f <$> ls)
   where f (x,y) | isJustWS x && isJustWS y = ("","")
-        f z = z
+        f z     = z
         isJustWS = all (\x -> x `elem` " \t")

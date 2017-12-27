@@ -1,4 +1,4 @@
-{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module IRTS.CodegenElixir(codegenElixir) where
@@ -118,9 +118,22 @@ helperModule = vcat . fmap text $
   , "      {:idris_lazy, _, val} -> val"
   , "      {:idris_lazy, thunk} -> thunk.()"
   , "      _ -> x"
-  , "      #_ -> raise(\"tried to force a non lazy value: \" <> Kernel.inspect(x))"
   , "    end"
   , "  end"
+  , ""
+  , "  def receive_any() do"
+  , "    receive do"
+  , "      x -> x"
+  , "    end"
+  , "  end"
+  , ""
+  , "  def spawn_idris(f) do"
+  , "    spawn(fn () -> f.().(:idris_nothing) end)"
+  , "  end"
+  , ""
+  -- , "  def send_any(pid, x) do"
+  -- , "    send(pid, x)"
+  -- , "  end"
   , "end"
   ]
 
@@ -178,13 +191,13 @@ cgCon name args =
   -- text "#" <+> text (showName name) $+$
   text "{" <> commaSeperated ((text ":" <> cgName name) : args) <> text "}"
 
--- showName :: Name -> String
--- showName n = case n of
---   UN t -> "UN (" ++ T.unpack t ++ ")"
---   NS n' ts -> "NS (" ++ showName n' ++ ") (" ++ show (T.unpack <$> ts) ++ ")"
---   MN i t -> "MN (" ++ show i ++ ") (" ++ T.unpack t ++ ")"
---   SN sn -> "SN (" ++ show sn ++ ")"
---   SymRef i -> "SymRef (" ++ show i ++ ")"
+showName :: Name -> String
+showName n = case n of
+  UN t -> "UN (" ++ T.unpack t ++ ")"
+  NS n' ts -> "NS (" ++ showName n' ++ ") (" ++ show (T.unpack <$> ts) ++ ")"
+  MN i t -> "MN (" ++ show i ++ ") (" ++ T.unpack t ++ ")"
+  SN sn -> "SN (" ++ show sn ++ ")"
+  SymRef i -> "SymRef (" ++ show i ++ ")"
 
 elixirDef :: (Name, LDecl) -> State CGState Doc
 elixirDef (name, decl) = do
@@ -195,10 +208,11 @@ elixirDef (name, decl) = do
       let argNames = cgName <$> arguments
       (stmts, retV) <- cgBody body
       pure $
-        --     text ""
-        -- $+$ multiLineComment (show decl)
             text ""
+        -- $+$ multiLineComment (show decl)
+        -- $+$ text ""
         $+$ text "#" <+> text (show name)
+        $+$ text "#" <+> text (showName name)
         $+$ defFunction
               (cgName name)
               argNames
@@ -244,6 +258,15 @@ cgBody body = case body of
                 $+$ cgAssign (cgVar scrutV) scrut
                 $+$ cgAssign (cgVar caseVar) cbody
     pure (stmts, cgVar caseVar)
+  -- -- special receive function
+  -- LApp _ (LV (Glob (NS (UN "unsafeReceive") ["Main"]))) [_,_] -> do
+  --   r <- fresh
+  --   x <- fresh
+  --   let e =
+  --             text "receive do"
+  --         $+$ indent (cgVar x <+> text "->" <+> [cgVar x])
+  --         $+$ text "end"
+  --   pure (stmts $+$ cgAssign (cgVar r) e, cgVar r)
   LApp _ (LV (Glob f)) args -> do
     ds_ <- getDefState f
     xs <- traverse prepArg args
@@ -293,7 +316,9 @@ cgBody body = case body of
     let ss = vcat $ fst <$> xs
     pure (ss, cgCon n (snd <$> xs))
   LConst c -> pure (empty, cgConst c)
-  LForeign{} -> pure (empty, text "UNIM FOREIGN")
+  LForeign _ (FStr fn) args -> do
+    as <- traverse cgBody (snd <$> args)
+    pure (empty, defFunApp (text fn) (snd <$> as))
   LOp prim args -> do
     as <- traverse cgBody args
     pure (vcat (fst <$> as), cgOp prim (snd <$> as))
@@ -310,7 +335,8 @@ prepArg (LV (Glob f)) = do
     Just ds -> pure
       ( empty
       , case fullArity ds of
-          0 -> cgName f <> text "()"
+          -- 0 -> cgName f <> text "()"
+          -- TODO: probably need to create a nested lambda here.
           n -> text "&" <> cgName f <> text ("/" ++ show n)
       )
     Nothing -> cgBody (LV (Glob f))
@@ -322,7 +348,7 @@ cgAlt (LConCase _ n ns e) = do
   pure $     --text "#" <+> text (show alt) $+$
              cgCon n (cgName <$> ns) <> text " ->"
          $+$ indent (ss $+$ b)
-cgAlt alt@(LConstCase con e) = do
+cgAlt (LConstCase con e) = do
   let c = cgConst con
   (ss, b) <- cgBody e
   pure $
@@ -335,10 +361,10 @@ cgAlt (LDefaultCase e) = do
         text "_ ->"
     $+$ indent (ss $+$ b)
 
-showConst :: Const -> String
-showConst c@(I _) = "I - " ++ show c
-showConst c@(BI _) = "BI - " ++ show c
-showConst c = show c
+-- showConst :: Const -> String
+-- showConst c@(I _)  = "I - " ++ show c
+-- showConst c@(BI _) = "BI - " ++ show c
+-- showConst c        = show c
 
 cgOp :: PrimFn -> [Doc] -> Doc
 cgOp pf es =

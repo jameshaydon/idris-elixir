@@ -1,6 +1,5 @@
 module Main where
 
-import Idris.Core.TT
 import Idris.AbsSyntax
 import Idris.CmdOptions
 import Idris.ElabDecls
@@ -40,7 +39,7 @@ c_main opts = do elabPrims
 
 main :: IO ()
 main = do opts <- getOpts
-          if (null (inputs opts)) 
+          if null (inputs opts)
              then showUsage
              else runMain (c_main opts)
 
