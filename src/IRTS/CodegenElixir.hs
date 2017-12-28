@@ -129,7 +129,7 @@ helperModule = vcat . fmap text $
   , "  end"
   , ""
   , "  def spawn_idris(f) do"
-  , "    spawn(fn () -> f.().(:idris_nothing) end)"
+  , "    spawn(fn () -> f.({}).(:idris_nothing) end)"
   , "  end"
   , ""
   -- , "  def send_any(pid, x) do"
@@ -215,8 +215,8 @@ elixirDef (name, decl) = do
       (stmts, retV) <- cgBody body
       pure $
             text ""
-        -- $+$ multiLineComment (show decl)
-        -- $+$ text ""
+        $+$ multiLineComment (show decl)
+        $+$ text ""
         $+$ text "#" <+> text (show name)
         $+$ text "#" <+> text (showName name)
         $+$ defFunction
@@ -265,6 +265,11 @@ fnApp f (x:xs) = fnApp (fnApp f [x]) xs
 
 cgBody :: LExp -> State CGState (Stmts, Expr)
 cgBody body = case body of
+  -- LV v@(Glob f) -> do
+  --   ds_ <- getDefState f
+  --   case ds_ of
+  --     Nothing -> pure (empty, cgVar v)
+  --     Just ds -> pure (empty, cgVar v <> text "()")
   LV v -> pure (empty, cgVar v)
   LCase _ e@(LOp _ [_, _]) [LConstCase (I 0) whenFalse, LDefaultCase whenTrue] -> do
     ifElseV <- fresh
@@ -299,11 +304,11 @@ cgBody body = case body of
   --         $+$ text "end"
   --   pure (stmts $+$ cgAssign (cgVar r) e, cgVar r)
   LApp _ (LV (Glob f)) args -> do
-    ds_ <- getDefState f
     xs <- traverse prepArg args
     let stmts = vcat (fst <$> xs)
     let argEs = snd <$> xs
     let numArgs = length args
+    ds_ <- getDefState f
     case ds_ of
       Nothing -> pure
         (stmts, fnApp (cgName f) argEs)
@@ -357,19 +362,18 @@ cgBody body = case body of
   LError s -> pure (empty, text ("\"ERROR: " ++ s ++ "\""))
   _ -> pure (empty, text "UNIM SOMETHING ELSE")
 
--- | Arguments which are references to global functions need to be treated
--- differently.
+-- | Arguments which are references to global functions need to be made into
+-- lambdas.
 prepArg :: LExp -> State CGState (Stmts, Expr)
 prepArg (LV (Glob f)) = do
   ds_ <- getDefState f
   case ds_ of
-    Just ds -> pure
-      ( empty
-      , case fullArity ds of
-          -- 0 -> cgName f <> text "()"
-          -- TODO: probably need to create a nested lambda here.
-          n -> text "&" <> cgName f <> text ("/" ++ show n)
-      )
+    Just ds -> do
+      xs <- sequence $ replicate (fullArity ds) fresh
+      let xs' = cgVar <$> xs
+      funV <- fresh
+      let fun = defLambda xs' (defFunApp (cgName f) xs')
+      pure ( cgAssign (cgVar funV) fun, cgVar funV )
     Nothing -> cgBody (LV (Glob f))
 prepArg x = cgBody x
 

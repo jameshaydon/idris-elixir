@@ -36,8 +36,11 @@ elxcall : (fname : String) -> (ty : Type) ->
           {auto fty : FTy FFI_Elx [] ty} -> ty
 elxcall fname ty = foreign FFI_Elx fname ty
 
-spawn : Ptr -> EIO Ptr
-spawn p = elxcall "IdrisRts.spawn_idris" (Ptr -> EIO Ptr) p
+spawnPtr : Ptr -> EIO Ptr
+spawnPtr p = elxcall "IdrisRts.spawn_idris" (Ptr -> EIO Ptr) p
+
+spawn : (() -> EIO ()) -> EIO Ptr
+spawn f = spawnPtr (believe_me f)
 
 receivePtr : EIO Ptr
 receivePtr = elxcall "IdrisRts.receive_any" (EIO Ptr)
@@ -75,8 +78,8 @@ foldTree : (a -> b) -> (b -> b -> b) -> Tree a -> b
 foldTree tip node (Tip x) = tip x
 foldTree tip node (Node x y) = node (foldTree tip node x) (foldTree tip node y)
 
-exampleTree : () -> Tree Int
-exampleTree _ =
+exampleTree : Tree Int
+exampleTree =
   Node (Node (Node (Tip 1) (Tip 2)) (Tip 3))
        (Node (Tip 4) (Node (Tip 5) (Tip 6)))
 
@@ -86,18 +89,18 @@ tips = foldTree pure (++)
 sumTips : Num a => Tree a -> a
 sumTips = foldTree id (+)
 
-echo : EIO ()
-echo = do
+echo : () -> EIO ()
+echo _ = do
   x <- unsafeReceive
   putStrLn' x
-  echo
+  echo ()
 
 main : EIO ()
 main = do
-  pid <- spawn (believe_me echo)
+  pid <- spawn echo
   unsafeSend pid "hello"
   unsafeSend pid "world"
   putStrLn' $ "Should be 55: " ++ show (fifi [1..10])
-  putStrLn' $ "Should be 21: " ++ show (sumTips (exampleTree ()))
-  putStrLn' $ "Should be " ++ show [1..6] ++ ": " ++ show (tips (exampleTree ()))
+  putStrLn' $ "Should be 21: " ++ show (sumTips (exampleTree))
+  putStrLn' $ "Should be " ++ show [1..6] ++ ": " ++ show (tips (exampleTree))
   putStrLn' $ "Should be 20: " ++ show (length (pythag 50))
