@@ -39,7 +39,7 @@ elxcall fname ty = foreign FFI_Elx fname ty
 spawnPtr : Ptr -> EIO Ptr
 spawnPtr p = elxcall "IdrisRts.spawn_idris" (Ptr -> EIO Ptr) p
 
-spawn : (() -> EIO ()) -> EIO Ptr
+spawn : (EIO ()) -> EIO Ptr
 spawn f = spawnPtr (believe_me f)
 
 receivePtr : EIO Ptr
@@ -89,11 +89,11 @@ tips = foldTree pure (++)
 sumTips : Num a => Tree a -> a
 sumTips = foldTree id (+)
 
-echo : () -> EIO ()
-echo _ = do
+echo :  EIO ()
+echo = do
   x <- unsafeReceive
   putStrLn' x
-  echo ()
+  echo
 
 main : EIO ()
 main = do

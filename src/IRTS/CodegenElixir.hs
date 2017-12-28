@@ -129,7 +129,7 @@ helperModule = vcat . fmap text $
   , "  end"
   , ""
   , "  def spawn_idris(f) do"
-  , "    spawn(fn () -> f.({}).(:idris_nothing) end)"
+  , "    spawn(fn () -> f.(:idris_nothing) end)"
   , "  end"
   , ""
   -- , "  def send_any(pid, x) do"
@@ -265,11 +265,11 @@ fnApp f (x:xs) = fnApp (fnApp f [x]) xs
 
 cgBody :: LExp -> State CGState (Stmts, Expr)
 cgBody body = case body of
-  -- LV v@(Glob f) -> do
-  --   ds_ <- getDefState f
-  --   case ds_ of
-  --     Nothing -> pure (empty, cgVar v)
-  --     Just ds -> pure (empty, cgVar v <> text "()")
+  LV v@(Glob f) -> do
+    ds_ <- getDefState f
+    case ds_ of
+      Nothing -> pure (empty, cgVar v)
+      Just ds -> pure (empty, cgVar v <> text "()")
   LV v -> pure (empty, cgVar v)
   LCase _ e@(LOp _ [_, _]) [LConstCase (I 0) whenFalse, LDefaultCase whenTrue] -> do
     ifElseV <- fresh
