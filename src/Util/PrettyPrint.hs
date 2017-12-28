@@ -5,7 +5,7 @@ module Util.PrettyPrint
     , int, text
     , comma, colon
     , lparen, rparen, lbracket, rbracket, lbrace, rbrace
-    , (<>), (<+>), ($+$), ($$)
+    , (<+>), ($+$), ($$)
     , (<?>)
     , nest
     , parens, brackets
@@ -19,12 +19,19 @@ module Util.PrettyPrint
     )
     where
 
+import Data.Monoid
+
 type Line = (String, String)  -- text, comment
 newtype Doc = Doc [Line]
+
 instance Show Doc where
     show = render "--"
 
-infixr 6 <>, <+>
+instance Monoid Doc where
+  mempty = Doc []
+  mappend (Doc xs) (Doc ys) = Doc $ meld "" xs ys
+
+infixr 6 <+>
 infixr 5 $$, $+$
 infixl 1 <?>
 
@@ -45,9 +52,6 @@ lbracket = text "["
 rbracket = text "]"
 lbrace   = text "{"
 rbrace   = text "}"
-
-(<>) :: Doc -> Doc -> Doc
-Doc xs <> Doc ys = Doc $ meld "" xs ys
 
 (<+>) :: Doc -> Doc -> Doc
 Doc xs <+> Doc ys = Doc $ meld " " xs ys

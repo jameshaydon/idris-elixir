@@ -3,6 +3,7 @@
 
 module IRTS.CodegenElixir(codegenElixir) where
 
+import Data.Monoid
 import           Control.Monad.Trans.State.Lazy
 import           Data.Char
 import           Data.List
@@ -199,13 +200,18 @@ showName n = case n of
   SN sn -> "SN (" ++ show sn ++ ")"
   SymRef i -> "SymRef (" ++ show i ++ ")"
 
+usedArgumentList :: [Name] -> LExp -> [Doc]
+usedArgumentList arguments body =
+  let used = usedArgs body `S.intersection` S.fromList arguments
+  in  [ (if u then empty else text "_") <> cgName a | a <- arguments, let u = S.member a used ]
+
 elixirDef :: (Name, LDecl) -> State CGState Doc
 elixirDef (name, decl) = do
   resetVarCounter
   case decl of
     LConstructor{} -> pure empty
     LFun _ _ arguments body -> do
-      let argNames = cgName <$> arguments
+      let argNames = usedArgumentList arguments body
       (stmts, retV) <- cgBody body
       pure $
             text ""
@@ -218,11 +224,36 @@ elixirDef (name, decl) = do
               argNames
               (stmts $+$ retV)
 
+usedArgs :: LExp -> S.Set Name
+usedArgs e = case e of
+  LV (Glob n) -> S.singleton n
+  LApp _ f xs -> usedArgs f <> foldMap usedArgs xs
+  LLazyApp f xs -> foldMap usedArgs xs
+  LForce e -> usedArgs e
+  LLet n x y -> usedArgs x <> usedArgs y
+  LProj e _ -> usedArgs e
+  LCon _ _ _ xs -> foldMap usedArgs xs
+  LCase _ e as -> usedArgs e <> foldMap frAlt as
+  LConst _ -> S.empty
+  LForeign _ _ xs -> foldMap usedArgs (snd <$> xs)
+  LOp primFn xs -> foldMap usedArgs xs
+  LNothing -> S.empty
+  LError e -> S.empty
+  where
+    frAlt (LConCase _ _ _ e) = usedArgs e
+    frAlt (LConstCase _ e) = usedArgs e
+    frAlt (LDefaultCase e) = usedArgs e
+
 cgAssign :: Doc -> Expr -> Stmts
-cgAssign v e = v <+> text "=" <+> e
+cgAssign v e =
+      v <+> text "="
+  $+$ indent e
+
+separatedWith :: Doc -> [Doc] -> Doc
+separatedWith sep xs = foldr (<>) (text "") (intercalate [sep] (pure <$> xs))
 
 commaSeperated :: [Doc] -> Doc
-commaSeperated xs = foldr (<>) (text "") (intercalate [text ", "] (pure <$> xs))
+commaSeperated = separatedWith (text ", ")
 
 defFunApp :: Doc -> [Doc] -> Doc
 defFunApp f xs = f <> text "(" <+> commaSeperated xs <+> text ")"
@@ -344,9 +375,10 @@ prepArg x = cgBody x
 
 cgAlt :: LAlt -> State CGState Expr
 cgAlt (LConCase _ n ns e) = do
+  let args = usedArgumentList ns e
   (ss, b) <- cgBody e
   pure $     --text "#" <+> text (show alt) $+$
-             cgCon n (cgName <$> ns) <> text " ->"
+             cgCon n args <> text " ->"
          $+$ indent (ss $+$ b)
 cgAlt (LConstCase con e) = do
   let c = cgConst con
@@ -382,10 +414,19 @@ cgOp pf es =
       ([i], LSExt ITNative ITBig) -> i -- TODO ?
       (as, LSLt _) -> bi as "<"
       (as, LSGt _) -> bi as ">"
-      (_, op)           -> text $ "raise(\"UNIM PRIM OP NOT IMPLEMENTED: " ++ show op ++ "\")"
+      ([], op) -> text "raise(\"UNIM PRIM OP NOT IMPLEMENTED: " <> text (show op) <> text "\")"
+      (xs, op) ->
+           text "raise(\"UNIM PRIM OP NOT IMPLEMENTED: "
+        <> text (show op)
+        <> text "\" <> "
+        <> listInspect xs
+        <> text " )"
   where
     bi [x,y] sym = x <+> text sym <+> y
     bi _ _       = text "ERROR UNIM"
+
+    inspect x = text "Kernel.inspect(" <> x <> text ")"
+    listInspect xs = separatedWith (text " <> ") (inspect <$> xs)
 
 cgConst :: Const -> Doc
 cgConst c = text $ case c of
