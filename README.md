@@ -22,9 +22,11 @@ send : (pid : PID m) -> (x : m) -> Beh a ()
 spawn : Beh b () -> Beh a (PID b)
 ```
 
+### Frequency allocation server
+
 Here is an example of a frequency allocation server for a telephone network (an example from the [Designing for Scalability with Erlang/OTP](http://shop.oreilly.com/product/0636920024149.do) book):
 
-```
+```idris
 State : Type
 State = List Int
 
@@ -49,6 +51,8 @@ loop free = do
 
 Full example [here](https://github.com/jameshaydon/idris-elixir/blob/master/examples/lib/Frequency.idr).
 
+### Handle polymorphic messages
+
 Using fancy idris types we can also make "polymorphic servers" responding to
 many sorts of messages, for example messages of any type which implements a
 certain interface:
@@ -64,6 +68,8 @@ printer = do
   send pid ()
   printer
 ```
+
+### Respond safely to arbitrary servers
 
 By including in the message a constructor (or arbitrary function to use to
 respond), we can also have servers which respond to various other processes:
@@ -93,8 +99,21 @@ foo coord ki = do
   send coord ()
 ```
 
-TODO: It would also be nice to create processes which implement _protocols_ specified
+__TODO:__ It would also be nice to create processes which implement _protocols_ specified
 in their type.
+
+### OTP
+
+I am in the process of making FFI functions for spaning OTP servers. For the moment there is only:
+
+```idris
+gengenserver : (init : () -> InitRet state reason) ->
+               (hcall : Req msg state -> HandleCallRet state reply reason) ->
+               EIO (Ptr, Ptr)
+```
+
+which will spawn an OTP GenServer with init function `init` and `hcall` for the `handle_call` callback.
+
 
 ## Build
 
