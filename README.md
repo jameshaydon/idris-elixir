@@ -1,9 +1,100 @@
 # Idris Elixir
 
-An Elixir code-generator for Idris based on the `LDecl` intermediate representation.
+An Elixir code-generator for Idris based on the `LDecl` intermediate representation. Use dependent types and other awsome Idris features with easy FFI to Elixir.
 
-Work in progress.
+Work in progress, much inspired by the [Javascript](https://github.com/idris-lang/Idris-dev/tree/master/src/IRTS/JavaScript) and [Python](https://github.com/ziman/idris-py) code-generators.
 
+## Examples
+
+There is a behaviour type `Beh : Type -> Type -> Type` which is used for coding safe actors. These are actors which won't send messages to actors which don't know how to handle them. `Beh a b` is code for a safe-actor which expects messages of type `a` which results in a `b`. The essential functions are:
+
+```idris
+||| PID of current process
+self : Beh a (PID a)
+
+||| Receive a message
+recv : Beh a a
+
+||| Send a message to a prcess which expects messages of that type
+send : (pid : PID m) -> (x : m) -> Beh a ()
+
+||| Spawn a new process and return PID
+spawn : Beh b () -> Beh a (PID b)
+```
+
+Here is an example of a frequency allocation server for a telephone network (an example from the [Designing for Scalability with Erlang/OTP](http://shop.oreilly.com/product/0636920024149.do) book):
+
+```
+State : Type
+State = List Int
+
+mutual
+  data Req = GetFreq (PID Resp) | RetFreq Int
+  data Resp = NoneFree | Freq Int
+
+loop : State -> Beh Req ()
+loop free = do
+  x <- recv
+  case x of
+    GetFreq pid => do
+      case free of
+        [] => do
+          send pid NoneFree
+          loop []
+        i :: rest => do
+          send pid (Freq i)
+          loop rest
+    RetFreq i => loop (i :: free)
+```
+
+Full example [here](https://github.com/jameshaydon/idris-elixir/blob/master/examples/lib/Frequency.idr).
+
+Using fancy idris types we can also make "polymorphic servers" responding to
+many sorts of messages, for example messages of any type which implements a
+certain interface:
+
+```idris
+data ShowVal : Type where
+  MkShowVal : {a : Type} -> (Show a) => a -> ShowVal
+
+printer : Beh (PID (), ShowVal) ()
+printer = do
+  (pid, MkShowVal x) <- recv
+  liftIO (putStrLn' ("Here is you printout: " ++ show x))
+  send pid ()
+  printer
+```
+
+By including in the message a constructor (or arbitrary function to use to
+respond), we can also have servers which respond to various other processes:
+
+```idris
+RespInt : Type
+RespInt = (a ** (PID a, Int -> a))
+
+keepInt : Int -> Beh (RespInt, Int) ()
+keepInt state = do
+  ((_ ** (pid, injInt)), i) <- recv
+  let newState = state + i
+  send pid (injInt newState)
+  keepInt newState
+
+sendKeepInt : PID (RespInt, Int) -> PID a -> (Int -> a) -> Int -> Beh a ()
+sendKeepInt ki pid f i = send ki ((_ ** (pid, f)), i)
+
+data Foo = A Int | B (List String)
+
+foo : PID () -> PID (RespInt, Int) -> Beh Foo ()
+foo coord ki = do
+  me <- self
+  sendKeepInt ki me A 1
+  A resp <- recv | _ => liftIO (putStrLn' "foo got back something else.")
+  liftIO (putStrLn' ("foo got back: " ++ show resp))
+  send coord ()
+```
+
+TODO: It would also be nice to create processes which implement _protocols_ specified
+in their type.
 
 ## Build
 

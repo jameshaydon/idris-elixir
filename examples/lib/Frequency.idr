@@ -8,7 +8,7 @@ State = List Int
 
 mutual
   data Req = GetFreq (PID Resp) | RetFreq Int
-  data Resp = NoneFree | HereYouGo (ExOK Int)
+  data Resp = NoneFree | Freq Int
 
 Show Req where
   show (GetFreq x) = "GetFreq " ++ show x
@@ -16,7 +16,7 @@ Show Req where
 
 Show Resp where
   show NoneFree = "NoneFree"
-  show (HereYouGo (OK x)) = "HereYouGo " ++ show x
+  show (Freq x) = "HereYouGo " ++ show x
 
 initState : State
 initState = [1..3]
@@ -26,26 +26,22 @@ loop free = do
   x <- recv
   case x of
     GetFreq pid => do
-      -- liftIO (putStrLn' ("Got freq req from pid, current state: " ++ show free))
       case free of
         [] => do
           send pid NoneFree
           loop []
         i :: rest => do
-          send pid (HereYouGo (OK i))
+          send pid (Freq i)
           loop rest
     RetFreq i => loop (i :: free)
-    _ => do
-      liftIO (putStrLn' "Somehow we are here?")
 
 phone : String -> PID Req -> PID () -> Beh Resp ()
 phone name serv m = do
-  liftIO (putStrLn' (show (OK "lol")))
   me <- self
   send serv (GetFreq me)
   resp <- recv
   case resp of
-    HereYouGo (OK i) => do
+    Freq i => do
       liftIO (putStrLn' ("phone " ++ name ++ " got a frequency: " ++ show i))
       liftIO (sleep 1500)
       send serv (RetFreq i)
