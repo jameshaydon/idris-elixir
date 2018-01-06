@@ -40,3 +40,4 @@ cabal.project.local
 
 examples/play/*
 examples/*.exs
+examples_2/*

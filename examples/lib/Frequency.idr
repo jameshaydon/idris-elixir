@@ -8,7 +8,7 @@ State = List Int
 
 mutual
   data Req = GetFreq (PID Resp) | RetFreq Int
-  data Resp = NoneFree | HereYouGo Int
+  data Resp = NoneFree | HereYouGo (ExOK Int)
 
 Show Req where
   show (GetFreq x) = "GetFreq " ++ show x
@@ -16,7 +16,7 @@ Show Req where
 
 Show Resp where
   show NoneFree = "NoneFree"
-  show (HereYouGo x) = "HereYouGo " ++ show x
+  show (HereYouGo (OK x)) = "HereYouGo " ++ show x
 
 initState : State
 initState = [1..3]
@@ -32,7 +32,7 @@ loop free = do
           send pid NoneFree
           loop []
         i :: rest => do
-          send pid (HereYouGo i)
+          send pid (HereYouGo (OK i))
           loop rest
     RetFreq i => loop (i :: free)
     _ => do
@@ -40,11 +40,12 @@ loop free = do
 
 phone : String -> PID Req -> PID () -> Beh Resp ()
 phone name serv m = do
+  liftIO (putStrLn' (show (OK "lol")))
   me <- self
   send serv (GetFreq me)
   resp <- recv
   case resp of
-    HereYouGo i => do
+    HereYouGo (OK i) => do
       liftIO (putStrLn' ("phone " ++ name ++ " got a frequency: " ++ show i))
       liftIO (sleep 1500)
       send serv (RetFreq i)
@@ -61,9 +62,15 @@ tester = do
   -- Spawn a frequency server:
   serv <- spawn (loop initState)
   -- Spawn 5 phones:
-  pids <- traverse spawn [ phone n serv me | n <- ["A","B","C","D","E"] ]
-  -- Wait for all the phones to say they managed to make a phone call:
-  _ <- sequence (replicate 5 recv)
+  pids <- traverse spawn
+            [ phone name serv me
+            | name <- [ n ++ show i
+                      | n <- ["A","B","C","D","E"]
+                      , i <- [1..10]
+                      ]
+            ]
+  -- Wait for all the phones to say they managed to make a p
+  _ <- sequence (replicate 50 recv)
   liftIO (putStrLn' "Done!")
 
 

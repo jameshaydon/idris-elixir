@@ -186,11 +186,11 @@ cgCon (NS (UN "MkPair") ["Builtins"]) [x, y] = text "{" <+> x <+> text "," <+> y
 cgCon (NS (UN "Nil") _) [] = text "[]"
 cgCon (NS (UN "::") _) [x,y] = text "[" <+> x <+> text "|" <+> y <+> text "]"
 -- No argument constructor
-cgCon name [] = text ":" <> cgName name
+cgCon name [] = constructorName name
 -- General constructor
 cgCon name args =
   -- text "#" <+> text (showName name) $+$
-  text "{" <> commaSeperated ((text ":" <> cgName name) : args) <> text "}"
+  text "{" <> commaSeperated (constructorName name : args) <> text "}"
 
 showName :: Name -> String
 showName n = case n of
@@ -209,7 +209,10 @@ elixirDef :: (Name, LDecl) -> State CGState Doc
 elixirDef (name, decl) = do
   resetVarCounter
   case decl of
-    LConstructor{} -> pure empty
+    con@LConstructor{} -> pure $
+          text "#" <+> text (showName name)
+      $+$ multiLineComment (show con)
+      $+$ text ""
     LFun _ _ arguments body -> do
       let argNames = usedArgumentList arguments body
       (stmts, retV) <- cgBody body
@@ -347,9 +350,9 @@ cgBody body = case body of
                 $+$ ss'
     pure (stmts, eb)
   LProj _ _ -> pure (empty, text "UNIM PROJ")
-  LCon _ _ n es -> do
+  c@(LCon _ _ n es) -> do
     xs <- traverse cgBody es
-    let ss = vcat $ fst <$> xs
+    let ss = (vcat $ fst <$> xs) $+$ (multiLineComment (show c ++ "\n" ++ show (length es)))
     pure (ss, cgCon n (snd <$> xs))
   LConst c -> pure (empty, cgConst c)
   LForeign _ (FStr fn) args -> do
@@ -409,6 +412,7 @@ cgOp pf es =
       (as, LMinus _)     -> bi as "-"
       (as, LTimes _)     -> bi as "*"
       (as, LStrConcat)   -> bi as "<>"
+      ([x], LStrHead) -> text "String.first(" <> x <> text ")"
       (as, LStrEq)       -> bi as "=="
       (as, LEq _)        -> bi as "=="
       ([e], LExternal _) -> e -- TODO: Not sure what this is
@@ -441,11 +445,8 @@ cgConst c = text $ case c of
   Str s -> show s
   _     -> "raise(\"!UNIM! constant: " ++ show c ++ "\""
 
-elixirName :: Name -> String
-elixirName n = "i_" ++ concatMap elixirChar (show n)
-  where
-    elixirChar x = case x of
-      '.' -> "_d_"
+elixirChar dot x = case x of
+      '.' -> dot
       '_' -> "_"
       '{' -> "_lc_"
       '}' -> "_rc_"
@@ -465,3 +466,16 @@ elixirName n = "i_" ++ concatMap elixirChar (show n)
       '#' -> "_hash_"
       c | isAlpha c || isDigit c -> [c]
         | otherwise              -> "_" ++ show (fromEnum x) ++ "_"
+
+elixirName :: Name -> String
+elixirName n = "i_" ++ concatMap (elixirChar "_d_") (show n)
+
+constructorName :: Name -> Doc
+constructorName (NS (UN un) _) | isLegalAtom (T.unpack un) = text (':' : T.unpack un)
+  where
+    isLegalAtom (c:cs) =
+         all isAlphaNum cs
+      && isAlpha c
+    isLegalAtom _ = False
+constructorName (NS (UN un) _) = text ":\"" <> text (concatMap (elixirChar ".") (T.unpack un)) <> text "\""
+constructorName n = text (concatMap (elixirChar ".") (show n))
