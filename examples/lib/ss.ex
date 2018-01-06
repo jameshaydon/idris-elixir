@@ -21,6 +21,27 @@ defmodule IdrisRts do
 end
 
 defmodule IdrisElixir do
+
+    # LFun [Inline] Prelude.Bool.&& [{e_0},{e_1}] case {e_0} of 
+    # 	| Prelude.Bool.False() => Prelude.Bool.False()
+    # 	| Prelude.Bool.True() => force{ {e_1} }
+
+  # Prelude.Bool.&&
+  # NS (UN (&&)) (["Bool","Prelude"])
+  def i_Prelude_d_Bool_d__and__and_( e0, e1 ) do
+    aux1 =
+      e0
+    aux2 =
+      case aux1 do
+        false ->
+            # Prelude.Bool.False()
+            # 0
+          false
+        true ->
+          IdrisRts.force(e1)
+      end
+    aux2
+  end
   # NS (UN (::)) (["ForeignEnv"])
     # LConstructor ForeignEnv.:: 1 0
 
@@ -312,7 +333,7 @@ defmodule IdrisElixir do
     # LConstructor Language.Reflection.Elab.DefineFun 0 0
 
   # UN (Delay)
-    # LConstructor Delay 0 0
+    # LConstructor Delay 0 1
 
   # UN (DelayReason)
     # LConstructor DelayReason 65562 0
@@ -503,6 +524,14 @@ defmodule IdrisElixir do
   # NS (UN (Foldable)) (["Foldable","Prelude"])
     # LConstructor Prelude.Foldable.Foldable 65582 1
 
+
+    # LFun [Inline] Force [{e_0},{e_1},{e_2}] force{ {e_2} }
+
+  # Force
+  # UN (Force)
+  def i_Force( _e0, _e1, e2 ) do
+    IdrisRts.force(e2)
+  end
   # NS (UN (Forgot)) (["Reflection","Language"])
     # LConstructor Language.Reflection.Forgot 12 0
 
@@ -725,6 +754,9 @@ defmodule IdrisElixir do
   # UN (LazyValue)
     # LConstructor LazyValue 1 0
 
+  # NS (UN (Leaf)) (["Main"])
+    # LConstructor Main.Leaf 0 1
+
   # NS (UN (Left)) (["Either","Prelude"])
     # LConstructor Prelude.Either.Left 0 1
 
@@ -874,6 +906,9 @@ defmodule IdrisElixir do
 
   # NS (UN (NoValidAlts)) (["Errors","Reflection","Language"])
     # LConstructor Language.Reflection.Errors.NoValidAlts 20 0
+
+  # NS (UN (Node)) (["Main"])
+    # LConstructor Main.Node 1 2
 
   # NS (UN (NonCollapsiblePostulate)) (["Errors","Reflection","Language"])
     # LConstructor Language.Reflection.Errors.NonCollapsiblePostulate 27 0
@@ -1248,7 +1283,7 @@ defmodule IdrisElixir do
     # LConstructor Language.Reflection.Str 4 0
 
   # NS (UN (StrCons)) (["Strings","Prelude"])
-    # LConstructor Prelude.Strings.StrCons 1 0
+    # LConstructor Prelude.Strings.StrCons 1 1
 
   # NS (UN (StrM)) (["Strings","Prelude"])
     # LConstructor Prelude.Strings.StrM 65635 1
@@ -1313,6 +1348,9 @@ defmodule IdrisElixir do
   # NS (UN (Traversable)) (["Traversable","Prelude"])
     # LConstructor Prelude.Traversable.Traversable 65644 1
 
+  # NS (UN (Tree)) (["Main"])
+    # LConstructor Main.Tree 65645 1
+
   # NS (UN (Trivial)) (["Reflection","Language"])
     # LConstructor Language.Reflection.Trivial 6 0
 
@@ -1323,7 +1361,7 @@ defmodule IdrisElixir do
     # LConstructor Language.Reflection.Try 0 0
 
   # NS (UN (TyConArg)) (["Elab","Reflection","Language"])
-    # LConstructor Language.Reflection.Elab.TyConArg 65645 0
+    # LConstructor Language.Reflection.Elab.TyConArg 65646 0
 
   # NS (UN (TyConIndex)) (["Elab","Reflection","Language"])
     # LConstructor Language.Reflection.Elab.TyConIndex 1 0
@@ -1332,13 +1370,13 @@ defmodule IdrisElixir do
     # LConstructor Language.Reflection.Elab.TyConParameter 0 0
 
   # NS (UN (TyDecl)) (["Elab","Reflection","Language"])
-    # LConstructor Language.Reflection.Elab.TyDecl 65646 0
+    # LConstructor Language.Reflection.Elab.TyDecl 65647 0
 
   # NS (UN (UN)) (["Reflection","Language"])
     # LConstructor Language.Reflection.UN 0 0
 
   # NS (UN (UPair)) (["Builtins"])
-    # LConstructor Builtins.UPair 65647 2
+    # LConstructor Builtins.UPair 65648 2
 
   # NS (UN (UType)) (["Reflection","Language"])
     # LConstructor Language.Reflection.UType 7 0
@@ -1356,16 +1394,16 @@ defmodule IdrisElixir do
     # LConstructor Language.Reflection.Errors.UnifyScope 6 0
 
   # NS (UN (Uninhabited)) (["Uninhabited","Prelude"])
-    # LConstructor Prelude.Uninhabited.Uninhabited 65648 1
+    # LConstructor Prelude.Uninhabited.Uninhabited 65649 1
 
   # NS (UN (UniqueType)) (["Reflection","Language"])
     # LConstructor Language.Reflection.UniqueType 1 0
 
   # UN (Unit)
-    # LConstructor Unit 65649 0
+    # LConstructor Unit 65650 0
 
   # NS (UN (Universe)) (["Reflection","Language"])
-    # LConstructor Language.Reflection.Universe 65650 0
+    # LConstructor Language.Reflection.Universe 65651 0
 
   # NS (UN (UniverseError)) (["Errors","Reflection","Language"])
     # LConstructor Language.Reflection.Errors.UniverseError 23 0
@@ -1374,7 +1412,7 @@ defmodule IdrisElixir do
     # LConstructor Language.Reflection.Errors.UnknownImplicit 26 0
 
   # NS (UN (User)) (["Show","Prelude"])
-    # LConstructor Prelude.Show.User 4 0
+    # LConstructor Prelude.Show.User 4 1
 
   # NS (UN (V)) (["Reflection","Language"])
     # LConstructor Language.Reflection.V 1 0
@@ -1383,13 +1421,13 @@ defmodule IdrisElixir do
     # LConstructor Language.Reflection.Var 0 0
 
   # UN (Void)
-    # LConstructor Void 65651 0
+    # LConstructor Void 65652 0
 
   # NS (UN (VoidType)) (["Reflection","Language"])
     # LConstructor Language.Reflection.VoidType 11 0
 
   # NS (UN (WellFounded)) (["WellFounded","Prelude"])
-    # LConstructor Prelude.WellFounded.WellFounded 65652 2
+    # LConstructor Prelude.WellFounded.WellFounded 65653 2
 
   # NS (UN (WhereN)) (["Reflection","Language"])
     # LConstructor Language.Reflection.WhereN 0 0
@@ -1401,7 +1439,7 @@ defmodule IdrisElixir do
     # LConstructor Language.Reflection.WithN 1 0
 
   # UN (World)
-    # LConstructor World 65653 0
+    # LConstructor World 65654 0
 
   # NS (UN (WorldType)) (["Reflection","Language"])
     # LConstructor Language.Reflection.WorldType 13 0
@@ -1474,6 +1512,48 @@ defmodule IdrisElixir do
     :idris_nothing
   end
 
+    # LFun [Inline] Prelude.Bool.ifThenElse [{e_0},{e_1},{e_2},{e_3}] case {e_1} of 
+    # 	| Prelude.Bool.False() => force{ {e_3} }
+    # 	| Prelude.Bool.True() => force{ {e_2} }
+
+  # Prelude.Bool.ifThenElse
+  # NS (UN (ifThenElse)) (["Bool","Prelude"])
+  def i_Prelude_d_Bool_d_ifThenElse( _e0, e1, e2, e3 ) do
+    aux1 =
+      e1
+    aux2 =
+      case aux1 do
+        false ->
+          IdrisRts.force(e3)
+        true ->
+          IdrisRts.force(e2)
+      end
+    aux2
+  end
+
+    # LFun [Inline] Prelude.Interfaces.intToBool [{e_0}] case {e_0} of 
+    # 	| 0 => Prelude.Bool.False()
+    # 	| _ => Prelude.Bool.True()
+
+  # Prelude.Interfaces.intToBool
+  # NS (UN (intToBool)) (["Interfaces","Prelude"])
+  def i_Prelude_d_Interfaces_d_intToBool( e0 ) do
+    aux1 =
+      e0
+    aux2 =
+      case aux1 do
+        0 ->
+            # Prelude.Bool.False()
+            # 0
+          false
+        _ ->
+            # Prelude.Bool.True()
+            # 0
+          true
+      end
+    aux2
+  end
+
     # LFun [] io_bind [{e_0},{e_1},{e_2},{e_3},{e_4},w] {io_bind_2}({e_0}, {e_1}, {e_2}, {e_3}, {e_4}, w, {e_3}(w))
 
   # io_bind
@@ -1518,7 +1598,7 @@ defmodule IdrisElixir do
     e2
   end
 
-    # LFun [] Main.main [] io_bind(____, ____, ____, ElixirFFI.gengenserver(____, ____, ____, ____, Main.ssinit, Main.hc), Main.{main_10}())
+    # LFun [] Main.main [] io_bind(____, ____, ____, ElixirFFI.gengenserver(____, ____, ____, ____, Main.ssinit, Main.hc), Main.{main_15}())
 
   # Main.main
   # NS (UN (main)) (["Main"])
@@ -1531,15 +1611,15 @@ defmodule IdrisElixir do
       fn ( aux3 ) ->
         i_Main_d_hc( aux3 )
       end
-    i_io_bind_partial5( :idris_nothing, :idris_nothing, :idris_nothing, i_ElixirFFI_d_gengenserver_partial6( :idris_nothing, :idris_nothing, :idris_nothing, :idris_nothing, aux2, aux4 ), i_Main_d__lc_main_10_rc__partial0(  ) )
+    i_io_bind_partial5( :idris_nothing, :idris_nothing, :idris_nothing, i_ElixirFFI_d_gengenserver_partial6( :idris_nothing, :idris_nothing, :idris_nothing, :idris_nothing, aux2, aux4 ), i_Main_d__lc_main_15_rc__partial0(  ) )
   end
 
-    # LFun [Inline] Main.{main_10} [{in_0}] case {in_0} of 
-    # 	| Builtins.MkPair({in_5}, {in_6}) => Prelude.Monad.>>=(____, Main.{main_3}(), ____, ____, Prelude.Interactive.putStr'(____, "spawned\n"), Main.{main_9}({in_6}))
+    # LFun [Inline] Main.{main_15} [{in_0}] case {in_0} of 
+    # 	| Builtins.MkPair({in_5}, {in_6}) => Prelude.Monad.>>=(____, Main.{main_3}(), ____, ____, Prelude.Interactive.putStr'(____, "spawned\n"), Main.{main_14}({in_6}))
 
-  # Main.{main_10}
-  # NS (MN (10) (main)) (["Main"])
-  def i_Main_d__lc_main_10_rc_( in0 ) do
+  # Main.{main_15}
+  # NS (MN (15) (main)) (["Main"])
+  def i_Main_d__lc_main_15_rc_( in0 ) do
     aux1 =
       in0
     aux2 =
@@ -1547,27 +1627,81 @@ defmodule IdrisElixir do
         { _in5 , in6 } ->
           aux3 =
             i_Prelude_d_Monad_d__gt__gt__eq_( :idris_nothing, i_Main_d__lc_main_3_rc__partial0(  ), :idris_nothing, :idris_nothing )
-          aux3.( i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "spawned\n" ) ).( i_Main_d__lc_main_9_rc__partial1( in6 ) )
+          aux3.( i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "spawned\n" ) ).( i_Main_d__lc_main_14_rc__partial1( in6 ) )
       end
     aux2
   end
 
-    # LFun [Inline] Main.{main_9} [{in_6},{in_7}] Prelude.Monad.>>=(____, Main.{main_7}(), ____, ____, ElixirFFI.gengencall({in_6}, 2), Main.{main_8}())
+    # LFun [Inline] Main.{main_14} [{in_6},{in_7}] Prelude.Monad.>>=(____, Main.{main_7}(), ____, ____, Prelude.Interactive.putStr'(____, LStrConcat(Prelude.Show.primNumShow(____, prim__toStrInt, Prelude.Show.Open(), Main.sumTree(Main.Node(Main.Leaf(9), Main.Leaf(4)))), "\n")), Main.{main_13}({in_6}))
+
+  # Main.{main_14}
+  # NS (MN (14) (main)) (["Main"])
+  def i_Main_d__lc_main_14_rc_( in6, _in7 ) do
+    aux2 =
+      fn ( aux1 ) ->
+        i_prim__toStrInt( aux1 )
+      end
+      # Prelude.Show.Open()
+      # 0
+      # Main.Leaf(9)
+      # 1
+      # Main.Leaf(4)
+      # 1
+      # Main.Node(Main.Leaf(9), Main.Leaf(4))
+      # 2
+    aux3 =
+      i_Prelude_d_Monad_d__gt__gt__eq_( :idris_nothing, i_Main_d__lc_main_7_rc__partial0(  ), :idris_nothing, :idris_nothing )
+    aux3.( i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, i_Prelude_d_Show_d_primNumShow( :idris_nothing, aux2, :Open, i_Main_d_sumTree( {:Node, {:Leaf, 9}, {:Leaf, 4}} ) ) <> "\n" ) ).( i_Main_d__lc_main_13_rc__partial1( in6 ) )
+  end
+
+    # LFun [Inline] Main.{main_13} [{in_6},{in_8}] Prelude.Monad.>>=(____, Main.{main_11}(), ____, ____, ElixirFFI.gengencall({in_6}, 2), Main.{main_12}())
+
+  # Main.{main_13}
+  # NS (MN (13) (main)) (["Main"])
+  def i_Main_d__lc_main_13_rc_( in6, _in8 ) do
+    aux1 =
+      i_Prelude_d_Monad_d__gt__gt__eq_( :idris_nothing, i_Main_d__lc_main_11_rc__partial0(  ), :idris_nothing, :idris_nothing )
+    aux1.( i_ElixirFFI_d_gengencall_partial2( in6, 2 ) ).( i_Main_d__lc_main_12_rc__partial0(  ) )
+  end
+
+    # LFun [Inline] Main.{main_12} [{in_9}] Prelude.Interactive.putStr'(____, "yoyo\n")
+
+  # Main.{main_12}
+  # NS (MN (12) (main)) (["Main"])
+  def i_Main_d__lc_main_12_rc_( _in9 ) do
+    i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "yoyo\n" )
+  end
+
+    # LFun [Inline] Main.{main_11} [{in_1}] Main.{main_10}()
+
+  # Main.{main_11}
+  # NS (MN (11) (main)) (["Main"])
+  def i_Main_d__lc_main_11_rc_( _in1 ) do
+    i_Main_d__lc_main_10_rc__partial0(  )
+  end
+
+    # LFun [Inline] Main.{main_10} [{in_2}] Main.{main_9}()
+
+  # Main.{main_10}
+  # NS (MN (10) (main)) (["Main"])
+  def i_Main_d__lc_main_10_rc_( _in2 ) do
+    i_Main_d__lc_main_9_rc__partial0(  )
+  end
+
+    # LFun [Inline] Main.{main_9} [{in_3}] Main.{main_8}({in_3})
 
   # Main.{main_9}
   # NS (MN (9) (main)) (["Main"])
-  def i_Main_d__lc_main_9_rc_( in6, _in7 ) do
-    aux1 =
-      i_Prelude_d_Monad_d__gt__gt__eq_( :idris_nothing, i_Main_d__lc_main_7_rc__partial0(  ), :idris_nothing, :idris_nothing )
-    aux1.( i_ElixirFFI_d_gengencall_partial2( in6, 2 ) ).( i_Main_d__lc_main_8_rc__partial0(  ) )
+  def i_Main_d__lc_main_9_rc_( in3 ) do
+    i_Main_d__lc_main_8_rc__partial1( in3 )
   end
 
-    # LFun [Inline] Main.{main_8} [{in_8}] Prelude.Interactive.putStr'(____, "yoyo\n")
+    # LFun [Inline] Main.{main_8} [{in_3},{in_4}] io_bind(____, ____, ____, {in_3}, {in_4})
 
   # Main.{main_8}
   # NS (MN (8) (main)) (["Main"])
-  def i_Main_d__lc_main_8_rc_( _in8 ) do
-    i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "yoyo\n" )
+  def i_Main_d__lc_main_8_rc_( in3, in4 ) do
+    i_io_bind_partial5( :idris_nothing, :idris_nothing, :idris_nothing, in3, in4 )
   end
 
     # LFun [Inline] Main.{main_7} [{in_1}] Main.{main_6}()
@@ -1642,6 +1776,150 @@ defmodule IdrisElixir do
     :idris_nothing
   end
 
+    # LFun [Inline] Prelude.Bool.not [{e_0}] case {e_0} of 
+    # 	| Prelude.Bool.False() => Prelude.Bool.True()
+    # 	| Prelude.Bool.True() => Prelude.Bool.False()
+
+  # Prelude.Bool.not
+  # NS (UN (not)) (["Bool","Prelude"])
+  def i_Prelude_d_Bool_d_not( e0 ) do
+    aux1 =
+      e0
+    aux2 =
+      case aux1 do
+        false ->
+            # Prelude.Bool.True()
+            # 0
+          true
+        true ->
+            # Prelude.Bool.False()
+            # 0
+          false
+      end
+    aux2
+  end
+
+    # LFun [] Prelude.Show.precCon [{e_0}] case {e_0} of 
+    # 	| Prelude.Show.App() => 6
+    # 	| Prelude.Show.Backtick() => 3
+    # 	| Prelude.Show.Dollar() => 2
+    # 	| Prelude.Show.Eq() => 1
+    # 	| Prelude.Show.Open() => 0
+    # 	| Prelude.Show.PrefixMinus() => 5
+    # 	| Prelude.Show.User({in_0}) => 4
+
+  # Prelude.Show.precCon
+  # NS (UN (precCon)) (["Show","Prelude"])
+  def i_Prelude_d_Show_d_precCon( e0 ) do
+    aux1 =
+      e0
+    aux2 =
+      case aux1 do
+        :App ->
+          6
+        :Backtick ->
+          3
+        :Dollar ->
+          2
+        :Eq ->
+          1
+        :Open ->
+          0
+        :PrefixMinus ->
+          5
+        {:User, _in0} ->
+          4
+      end
+    aux2
+  end
+
+    # LFun [] Prelude.Show.primNumShow [{e_0},{e_1},{e_2},{e_3}] let {in_0} = {e_1}({e_3}) in case case Prelude.Interfaces.Prelude.Show.Prec implementation of Prelude.Interfaces.Ord, method >=({e_2}, Prelude.Show.PrefixMinus()) of 
+    # 	| Prelude.Bool.False() => Prelude.Bool.False()
+    # 	| Prelude.Bool.True() => force{ Prelude.Show.{primNumShow_2}|({in_0}, {e_0}, {e_1}, {e_2}, {e_3}) } of 
+    # 	| Prelude.Bool.False() => {in_0}
+    # 	| Prelude.Bool.True() => LStrConcat("(", LStrConcat({in_0}, ")"))
+
+  # Prelude.Show.primNumShow
+  # NS (UN (primNumShow)) (["Show","Prelude"])
+  def i_Prelude_d_Show_d_primNumShow( e0, e1, e2, e3 ) do
+    in0 =
+      e1.( e3 )
+      # Prelude.Show.PrefixMinus()
+      # 0
+    aux2 =
+      i_Prelude_d_Interfaces_d_Prelude_d_Show_d_Prec_s_implementation_s_of_s_Prelude_d_Interfaces_d_Ord_c__s_method_s__gt__eq_( e2, :PrefixMinus )
+    aux3 =
+      case aux2 do
+        false ->
+            # Prelude.Bool.False()
+            # 0
+          false
+        true ->
+          i_Prelude_d_Show_d__lc_primNumShow_2_rc_( in0, e0, e1, e2, e3 )
+      end
+    aux1 =
+      aux3
+    aux4 =
+      case aux1 do
+        false ->
+          in0
+        true ->
+          "(" <> in0 <> ")"
+      end
+    aux4
+  end
+
+    # LFun [NoInline] Prelude.Show.{primNumShow_2} [{in_0},{e_0},{e_1},{e_2},{e_3}] case Prelude.Strings.strM({in_0}) of 
+    # 	| Prelude.Strings.StrCons({in_2}) => Prelude.Show.{primNumShow_1}({e_0}, {e_1}, {e_2}, {e_3}, {in_0}, {in_2}, {in_2})
+    # 	| Prelude.Strings.StrNil() => Prelude.Bool.False()
+
+  # Prelude.Show.{primNumShow_2}
+  # NS (MN (2) (primNumShow)) (["Show","Prelude"])
+  def i_Prelude_d_Show_d__lc_primNumShow_2_rc_( in0, e0, e1, e2, e3 ) do
+    aux1 =
+      i_Prelude_d_Strings_d_strM( in0 )
+    aux2 =
+      case aux1 do
+        {:StrCons, in2} ->
+          aux3 =
+            i_Prelude_d_Show_d__lc_primNumShow_1_rc_( e0, e1, e2, e3, in0, in2 )
+          aux3.( in2 )
+        :StrNil ->
+            # Prelude.Bool.False()
+            # 0
+          false
+      end
+    aux2
+  end
+
+    # LFun [Inline] Prelude.Show.{primNumShow_1} [{e_0},{e_1},{e_2},{e_3},{in_0},{in_2}] Prelude.Show.{primNumShow_0}()
+
+  # Prelude.Show.{primNumShow_1}
+  # NS (MN (1) (primNumShow)) (["Show","Prelude"])
+  def i_Prelude_d_Show_d__lc_primNumShow_1_rc_( _e0, _e1, _e2, _e3, _in0, _in2 ) do
+    i_Prelude_d_Show_d__lc_primNumShow_0_rc__partial0(  )
+  end
+
+    # LFun [Inline] Prelude.Show.{primNumShow_0} [{in_1}] case LEq (ATInt ITChar)({in_1}, '-') of 
+    # 	| 0 => Prelude.Bool.False()
+    # 	| _ => Prelude.Bool.True()
+
+  # Prelude.Show.{primNumShow_0}
+  # NS (MN (0) (primNumShow)) (["Show","Prelude"])
+  def i_Prelude_d_Show_d__lc_primNumShow_0_rc_( in1 ) do
+    aux1 =
+      if ( in1 == '-' ) do
+          # Prelude.Bool.True()
+          # 0
+        true
+      else
+          # Prelude.Bool.False()
+          # 0
+        false
+      end
+    aux1
+  end
+
     # LFun [] prim__addInt [{op_0},{op_1}] LPlus (ATInt ITNative)({op_0}, {op_1})
 
   # prim__addInt
@@ -1658,6 +1936,30 @@ defmodule IdrisElixir do
     op0
   end
 
+    # LFun [] prim__concat [{op_0},{op_1}] LStrConcat({op_0}, {op_1})
+
+  # prim__concat
+  # UN (prim__concat)
+  def i_prim__concat( op0, op1 ) do
+    op0 <> op1
+  end
+
+    # LFun [] prim__eqBigInt [{op_0},{op_1}] LEq (ATInt ITBig)({op_0}, {op_1})
+
+  # prim__eqBigInt
+  # UN (prim__eqBigInt)
+  def i_prim__eqBigInt( op0, op1 ) do
+    op0 == op1
+  end
+
+    # LFun [] prim__eqChar [{op_0},{op_1}] LEq (ATInt ITChar)({op_0}, {op_1})
+
+  # prim__eqChar
+  # UN (prim__eqChar)
+  def i_prim__eqChar( op0, op1 ) do
+    op0 == op1
+  end
+
     # LFun [] prim__eqManagedPtr [{op_0},{op_1}] LExternal prim__eqManagedPtr({op_0}, {op_1})
 
   # prim__eqManagedPtr
@@ -1672,6 +1974,14 @@ defmodule IdrisElixir do
   # UN (prim__eqPtr)
   def i_prim__eqPtr( op0, op1 ) do
     raise("UNIM PRIM OP NOT IMPLEMENTED: LExternal prim__eqPtr" <> Kernel.inspect(op0) <> Kernel.inspect(op1) )
+  end
+
+    # LFun [] prim__eqString [{op_0},{op_1}] LStrEq({op_0}, {op_1})
+
+  # prim__eqString
+  # UN (prim__eqString)
+  def i_prim__eqString( op0, op1 ) do
+    op0 == op1
   end
 
     # LFun [] prim__null [] LExternal prim__null()
@@ -1834,6 +2144,14 @@ defmodule IdrisElixir do
     raise("UNIM PRIM OP NOT IMPLEMENTED: LExternal prim__sizeofPtr")
   end
 
+    # LFun [] prim__sltBigInt [{op_0},{op_1}] LSLt (ATInt ITBig)({op_0}, {op_1})
+
+  # prim__sltBigInt
+  # UN (prim__sltBigInt)
+  def i_prim__sltBigInt( op0, op1 ) do
+    op0 < op1
+  end
+
     # LFun [] prim__stderr [] LExternal prim__stderr()
 
   # prim__stderr
@@ -1856,6 +2174,22 @@ defmodule IdrisElixir do
   # UN (prim__stdout)
   def i_prim__stdout(  ) do
     raise("UNIM PRIM OP NOT IMPLEMENTED: LExternal prim__stdout")
+  end
+
+    # LFun [] prim__strHead [{op_0}] LStrHead({op_0})
+
+  # prim__strHead
+  # UN (prim__strHead)
+  def i_prim__strHead( op0 ) do
+    String.first(op0)
+  end
+
+    # LFun [] prim__toStrInt [{op_0}] LIntStr ITNative({op_0})
+
+  # prim__toStrInt
+  # UN (prim__toStrInt)
+  def i_prim__toStrInt( op0 ) do
+    to_string( op0 )
   end
 
     # LFun [] prim__vm [{op_0}] LExternal prim__vm({op_0})
@@ -1924,6 +2258,25 @@ defmodule IdrisElixir do
     e1.( :idris_nothing )
   end
 
+    # LFun [Inline] Prelude.Show.showParens [{e_0},{e_1}] case {e_0} of 
+    # 	| Prelude.Bool.False() => {e_1}
+    # 	| Prelude.Bool.True() => LStrConcat("(", LStrConcat({e_1}, ")"))
+
+  # Prelude.Show.showParens
+  # NS (UN (showParens)) (["Show","Prelude"])
+  def i_Prelude_d_Show_d_showParens( e0, e1 ) do
+    aux1 =
+      e0
+    aux2 =
+      case aux1 do
+        false ->
+          e1
+        true ->
+          "(" <> e1 <> ")"
+      end
+    aux2
+  end
+
     # LFun [Inline] Main.ssinit [{e_0}] ElixirFFI.Init.Ok(0)
 
   # Main.ssinit
@@ -1932,6 +2285,77 @@ defmodule IdrisElixir do
       # ElixirFFI.Init.Ok(0)
       # 1
     {:Ok, 0}
+  end
+
+    # LFun [] Prelude.Strings.strM [{e_0}] case Decidable.Equality.Decidable.Equality.Bool implementation of Decidable.Equality.DecEq, method decEq(case case LStrEq({e_0}, "") of 
+    # 	| 0 => Prelude.Bool.False()
+    # 	| _ => Prelude.Bool.True() of 
+    # 	| Prelude.Bool.False() => Prelude.Bool.True()
+    # 	| Prelude.Bool.True() => Prelude.Bool.False(), Prelude.Bool.True()) of 
+    # 	| Prelude.Basics.No() => Prelude.Strings.StrNil()
+    # 	| Prelude.Basics.Yes() => Prelude.Strings.StrCons(LStrHead({e_0}))
+
+  # Prelude.Strings.strM
+  # NS (UN (strM)) (["Strings","Prelude"])
+  def i_Prelude_d_Strings_d_strM( e0 ) do
+    aux3 =
+      if ( e0 == "" ) do
+          # Prelude.Bool.True()
+          # 0
+        true
+      else
+          # Prelude.Bool.False()
+          # 0
+        false
+      end
+    aux2 =
+      aux3
+    aux4 =
+      case aux2 do
+        false ->
+            # Prelude.Bool.True()
+            # 0
+          true
+        true ->
+            # Prelude.Bool.False()
+            # 0
+          false
+      end
+      # Prelude.Bool.True()
+      # 0
+    aux1 =
+      i_Decidable_d_Equality_d_Decidable_d_Equality_d_Bool_s_implementation_s_of_s_Decidable_d_Equality_d_DecEq_c__s_method_s_decEq( aux4, true )
+    aux5 =
+      case aux1 do
+        :No ->
+            # Prelude.Strings.StrNil()
+            # 0
+          :StrNil
+        :Yes ->
+            # Prelude.Strings.StrCons(LStrHead({e_0}))
+            # 1
+          {:StrCons, String.first(e0)}
+      end
+    aux5
+  end
+
+    # LFun [] Main.sumTree [{e_0}] case {e_0} of 
+    # 	| Main.Leaf({in_0}) => {in_0}
+    # 	| Main.Node({in_1}, {in_2}) => LPlus (ATInt ITNative)(Main.sumTree({in_1}), Main.sumTree({in_2}))
+
+  # Main.sumTree
+  # NS (UN (sumTree)) (["Main"])
+  def i_Main_d_sumTree( e0 ) do
+    aux1 =
+      e0
+    aux2 =
+      case aux1 do
+        {:Leaf, in0} ->
+          in0
+        {:Node, in1, in2} ->
+          i_Main_d_sumTree( in1 ) + i_Main_d_sumTree( in2 )
+      end
+    aux2
   end
 
     # LFun [Inline] unsafePerformPrimIO [] ____
@@ -1949,8 +2373,29 @@ defmodule IdrisElixir do
   def i_world( e0 ) do
     e0
   end
+
+    # LFun [Inline] Prelude.Bool.|| [{e_0},{e_1}] case {e_0} of 
+    # 	| Prelude.Bool.False() => force{ {e_1} }
+    # 	| Prelude.Bool.True() => Prelude.Bool.True()
+
+  # Prelude.Bool.||
+  # NS (UN (||)) (["Bool","Prelude"])
+  def i_Prelude_d_Bool_d__124__124_( e0, e1 ) do
+    aux1 =
+      e0
+    aux2 =
+      case aux1 do
+        false ->
+          IdrisRts.force(e1)
+        true ->
+            # Prelude.Bool.True()
+            # 0
+          true
+      end
+    aux2
+  end
   # MN (0) (__Infer)
-    # LConstructor {__Infer_0} 65654 0
+    # LConstructor {__Infer_0} 65655 0
 
   # MN (0) (__infer)
     # LConstructor {__infer_0} 0 0
@@ -2004,6 +2449,419 @@ defmodule IdrisElixir do
     :idris_nothing
   end
 
+    # LFun [] Decidable.Equality.Decidable.Equality.Bool implementation of Decidable.Equality.DecEq, method decEq [{e_0},{e_1}] case {e_1} of 
+    # 	| Prelude.Bool.False() => case {e_0} of 
+    # 	.   | Prelude.Bool.False() => Prelude.Basics.Yes()
+    # 	.   | Prelude.Bool.True() => Prelude.Basics.No()
+    # 	| Prelude.Bool.True() => case {e_0} of 
+    # 	    | Prelude.Bool.False() => Prelude.Basics.No()
+    # 	    | Prelude.Bool.True() => Prelude.Basics.Yes()
+
+  # Decidable.Equality.Decidable.Equality.Bool implementation of Decidable.Equality.DecEq, method decEq
+  # NS (SN (Decidable.Equality.Bool implementation of Decidable.Equality.DecEq, method decEq)) (["Equality","Decidable"])
+  def i_Decidable_d_Equality_d_Decidable_d_Equality_d_Bool_s_implementation_s_of_s_Decidable_d_Equality_d_DecEq_c__s_method_s_decEq( e0, e1 ) do
+    aux1 =
+      e1
+    aux2 =
+      case aux1 do
+        false ->
+          aux3 =
+            e0
+          aux4 =
+            case aux3 do
+              false ->
+                  # Prelude.Basics.Yes()
+                  # 0
+                :Yes
+              true ->
+                  # Prelude.Basics.No()
+                  # 0
+                :No
+            end
+          aux4
+        true ->
+          aux5 =
+            e0
+          aux6 =
+            case aux5 do
+              false ->
+                  # Prelude.Basics.No()
+                  # 0
+                :No
+              true ->
+                  # Prelude.Basics.Yes()
+                  # 0
+                :Yes
+            end
+          aux6
+      end
+    aux2
+  end
+
+    # LFun [] Prelude.Interfaces.Prelude.Nat.Nat implementation of Prelude.Interfaces.Eq, method == [{e_0},{e_1}] case {e_1} of 
+    # 	| 0 => case {e_0} of 
+    # 	.   | 0 => Prelude.Bool.True()
+    # 	.   | _ => Prelude.Bool.False()
+    # 	| _ => let {in_0} = LMinus (ATInt ITBig)({e_1}, 1) in case {e_0} of 
+    # 	.   | 0 => Prelude.Bool.False()
+    # 	.   | _ => let {in_1} = LMinus (ATInt ITBig)({e_0}, 1) in Prelude.Interfaces.Prelude.Nat.Nat implementation of Prelude.Interfaces.Eq, method ==({in_1}, {in_0})
+    # 	| _ => Prelude.Bool.False()
+
+  # Prelude.Interfaces.Prelude.Nat.Nat implementation of Prelude.Interfaces.Eq, method ==
+  # NS (SN (Prelude.Nat.Nat implementation of Prelude.Interfaces.Eq, method ==)) (["Interfaces","Prelude"])
+  def i_Prelude_d_Interfaces_d_Prelude_d_Nat_d_Nat_s_implementation_s_of_s_Prelude_d_Interfaces_d_Eq_c__s_method_s__eq__eq_( e0, e1 ) do
+    aux1 =
+      e1
+    aux2 =
+      case aux1 do
+        0 ->
+          aux3 =
+            e0
+          aux4 =
+            case aux3 do
+              0 ->
+                  # Prelude.Bool.True()
+                  # 0
+                true
+              _ ->
+                  # Prelude.Bool.False()
+                  # 0
+                false
+            end
+          aux4
+        _ ->
+          in0 =
+            e1 - 1
+          aux5 =
+            e0
+          aux6 =
+            case aux5 do
+              0 ->
+                  # Prelude.Bool.False()
+                  # 0
+                false
+              _ ->
+                in1 =
+                  e0 - 1
+                i_Prelude_d_Interfaces_d_Prelude_d_Nat_d_Nat_s_implementation_s_of_s_Prelude_d_Interfaces_d_Eq_c__s_method_s__eq__eq_( in1, in0 )
+            end
+          aux6
+        _ ->
+            # Prelude.Bool.False()
+            # 0
+          false
+      end
+    aux2
+  end
+
+    # LFun [] Prelude.Interfaces.Prelude.Show.Prec implementation of Prelude.Interfaces.Eq, method == [{e_0},{e_1}] case {e_1} of 
+    # 	| Prelude.Show.User({in_0}) => case {e_0} of 
+    # 	.   | Prelude.Show.User({in_1}) => Prelude.Interfaces.Prelude.Nat.Nat implementation of Prelude.Interfaces.Eq, method ==({in_1}, {in_0})
+    # 	.   | _ => case LEq (ATInt ITBig)(Prelude.Show.precCon({e_0}), Prelude.Show.precCon({e_1})) of 
+    # 	.       | 0 => Prelude.Bool.False()
+    # 	.       | _ => Prelude.Bool.True()
+    # 	| _ => case LEq (ATInt ITBig)(Prelude.Show.precCon({e_0}), Prelude.Show.precCon({e_1})) of 
+    # 	    | 0 => Prelude.Bool.False()
+    # 	    | _ => Prelude.Bool.True()
+
+  # Prelude.Interfaces.Prelude.Show.Prec implementation of Prelude.Interfaces.Eq, method ==
+  # NS (SN (Prelude.Show.Prec implementation of Prelude.Interfaces.Eq, method ==)) (["Interfaces","Prelude"])
+  def i_Prelude_d_Interfaces_d_Prelude_d_Show_d_Prec_s_implementation_s_of_s_Prelude_d_Interfaces_d_Eq_c__s_method_s__eq__eq_( e0, e1 ) do
+    aux1 =
+      e1
+    aux2 =
+      case aux1 do
+        {:User, in0} ->
+          aux3 =
+            e0
+          aux4 =
+            case aux3 do
+              {:User, in1} ->
+                i_Prelude_d_Interfaces_d_Prelude_d_Nat_d_Nat_s_implementation_s_of_s_Prelude_d_Interfaces_d_Eq_c__s_method_s__eq__eq_( in1, in0 )
+              _ ->
+                aux5 =
+                  if ( i_Prelude_d_Show_d_precCon( e0 ) == i_Prelude_d_Show_d_precCon( e1 ) ) do
+                      # Prelude.Bool.True()
+                      # 0
+                    true
+                  else
+                      # Prelude.Bool.False()
+                      # 0
+                    false
+                  end
+                aux5
+            end
+          aux4
+        _ ->
+          aux6 =
+            if ( i_Prelude_d_Show_d_precCon( e0 ) == i_Prelude_d_Show_d_precCon( e1 ) ) do
+                # Prelude.Bool.True()
+                # 0
+              true
+            else
+                # Prelude.Bool.False()
+                # 0
+              false
+            end
+          aux6
+      end
+    aux2
+  end
+
+    # LFun [] Prelude.Interfaces.Prelude.Interfaces.Integer implementation of Prelude.Interfaces.Ord, method compare [{e_0},{e_1}] case case LEq (ATInt ITBig)({e_0}, {e_1}) of 
+    # 	| 0 => Prelude.Bool.False()
+    # 	| _ => Prelude.Bool.True() of 
+    # 	| Prelude.Bool.False() => case case LSLt (ATInt ITBig)({e_0}, {e_1}) of 
+    # 	.   | 0 => Prelude.Bool.False()
+    # 	.   | _ => Prelude.Bool.True() of 
+    # 	.   | Prelude.Bool.False() => Prelude.Interfaces.GT()
+    # 	.   | Prelude.Bool.True() => Prelude.Interfaces.LT()
+    # 	| Prelude.Bool.True() => Prelude.Interfaces.EQ()
+
+  # Prelude.Interfaces.Prelude.Interfaces.Integer implementation of Prelude.Interfaces.Ord, method compare
+  # NS (SN (Prelude.Interfaces.Integer implementation of Prelude.Interfaces.Ord, method compare)) (["Interfaces","Prelude"])
+  def i_Prelude_d_Interfaces_d_Prelude_d_Interfaces_d_Integer_s_implementation_s_of_s_Prelude_d_Interfaces_d_Ord_c__s_method_s_compare( e0, e1 ) do
+    aux2 =
+      if ( e0 == e1 ) do
+          # Prelude.Bool.True()
+          # 0
+        true
+      else
+          # Prelude.Bool.False()
+          # 0
+        false
+      end
+    aux1 =
+      aux2
+    aux3 =
+      case aux1 do
+        false ->
+          aux5 =
+            if ( e0 < e1 ) do
+                # Prelude.Bool.True()
+                # 0
+              true
+            else
+                # Prelude.Bool.False()
+                # 0
+              false
+            end
+          aux4 =
+            aux5
+          aux6 =
+            case aux4 do
+              false ->
+                  # Prelude.Interfaces.GT()
+                  # 0
+                :GT
+              true ->
+                  # Prelude.Interfaces.LT()
+                  # 0
+                :LT
+            end
+          aux6
+        true ->
+            # Prelude.Interfaces.EQ()
+            # 0
+          :EQ
+      end
+    aux3
+  end
+
+    # LFun [] Prelude.Interfaces.Prelude.Nat.Nat implementation of Prelude.Interfaces.Ord, method compare [{e_0},{e_1}] case {e_1} of 
+    # 	| 0 => case {e_0} of 
+    # 	.   | 0 => Prelude.Interfaces.EQ()
+    # 	.   | _ => let {in_0} = LMinus (ATInt ITBig)({e_0}, 1) in Prelude.Interfaces.GT()
+    # 	| _ => let {in_1} = LMinus (ATInt ITBig)({e_1}, 1) in case {e_0} of 
+    # 	    | 0 => Prelude.Interfaces.LT()
+    # 	    | _ => let {in_2} = LMinus (ATInt ITBig)({e_0}, 1) in Prelude.Interfaces.Prelude.Nat.Nat implementation of Prelude.Interfaces.Ord, method compare({in_2}, {in_1})
+
+  # Prelude.Interfaces.Prelude.Nat.Nat implementation of Prelude.Interfaces.Ord, method compare
+  # NS (SN (Prelude.Nat.Nat implementation of Prelude.Interfaces.Ord, method compare)) (["Interfaces","Prelude"])
+  def i_Prelude_d_Interfaces_d_Prelude_d_Nat_d_Nat_s_implementation_s_of_s_Prelude_d_Interfaces_d_Ord_c__s_method_s_compare( e0, e1 ) do
+    aux1 =
+      e1
+    aux2 =
+      case aux1 do
+        0 ->
+          aux3 =
+            e0
+          aux4 =
+            case aux3 do
+              0 ->
+                  # Prelude.Interfaces.EQ()
+                  # 0
+                :EQ
+              _ ->
+                in0 =
+                  e0 - 1
+                  # Prelude.Interfaces.GT()
+                  # 0
+                :GT
+            end
+          aux4
+        _ ->
+          in1 =
+            e1 - 1
+          aux5 =
+            e0
+          aux6 =
+            case aux5 do
+              0 ->
+                  # Prelude.Interfaces.LT()
+                  # 0
+                :LT
+              _ ->
+                in2 =
+                  e0 - 1
+                i_Prelude_d_Interfaces_d_Prelude_d_Nat_d_Nat_s_implementation_s_of_s_Prelude_d_Interfaces_d_Ord_c__s_method_s_compare( in2, in1 )
+            end
+          aux6
+      end
+    aux2
+  end
+
+    # LFun [] Prelude.Interfaces.Prelude.Show.Prec implementation of Prelude.Interfaces.Ord, method >= [{e_0},{e_1}] case case Prelude.Interfaces.Prelude.Show.Prec implementation of Prelude.Interfaces.Ord, method compare({e_0}, {e_1}) of 
+    # 	| Prelude.Interfaces.GT() => Prelude.Bool.True()
+    # 	| _ => Prelude.Bool.False() of 
+    # 	| Prelude.Bool.False() => force{ Prelude.Interfaces.{Prelude.Show.@Prelude.Interfaces.Ord$Prec:!>=:0_lam_0}|({e_0}, {e_1}) }
+    # 	| Prelude.Bool.True() => Prelude.Bool.True()
+
+  # Prelude.Interfaces.Prelude.Show.Prec implementation of Prelude.Interfaces.Ord, method >=
+  # NS (SN (Prelude.Show.Prec implementation of Prelude.Interfaces.Ord, method >=)) (["Interfaces","Prelude"])
+  def i_Prelude_d_Interfaces_d_Prelude_d_Show_d_Prec_s_implementation_s_of_s_Prelude_d_Interfaces_d_Ord_c__s_method_s__gt__eq_( e0, e1 ) do
+    aux2 =
+      i_Prelude_d_Interfaces_d_Prelude_d_Show_d_Prec_s_implementation_s_of_s_Prelude_d_Interfaces_d_Ord_c__s_method_s_compare( e0, e1 )
+    aux3 =
+      case aux2 do
+        :GT ->
+            # Prelude.Bool.True()
+            # 0
+          true
+        _ ->
+            # Prelude.Bool.False()
+            # 0
+          false
+      end
+    aux1 =
+      aux3
+    aux4 =
+      case aux1 do
+        false ->
+          i_Prelude_d_Interfaces_d__lc_Prelude_d_Show_d__at_Prelude_d_Interfaces_d_Ord_36_Prec_colon__bang__gt__eq__colon_0_lam_0_rc_( e0, e1 )
+        true ->
+            # Prelude.Bool.True()
+            # 0
+          true
+      end
+    aux4
+  end
+
+    # LFun [NoInline] Prelude.Interfaces.{Prelude.Show.@Prelude.Interfaces.Ord$Prec:!>=:0_lam_0} [{e_0},{e_1}] Prelude.Interfaces.Prelude.Show.Prec implementation of Prelude.Interfaces.Eq, method ==({e_0}, {e_1})
+
+  # Prelude.Interfaces.{Prelude.Show.@Prelude.Interfaces.Ord$Prec:!>=:0_lam_0}
+  # NS (MN (0) (Prelude.Show.@Prelude.Interfaces.Ord$Prec:!>=:0_lam)) (["Interfaces","Prelude"])
+  def i_Prelude_d_Interfaces_d__lc_Prelude_d_Show_d__at_Prelude_d_Interfaces_d_Ord_36_Prec_colon__bang__gt__eq__colon_0_lam_0_rc_( e0, e1 ) do
+    i_Prelude_d_Interfaces_d_Prelude_d_Show_d_Prec_s_implementation_s_of_s_Prelude_d_Interfaces_d_Eq_c__s_method_s__eq__eq_( e0, e1 )
+  end
+
+    # LFun [] Prelude.Interfaces.Prelude.Show.Prec implementation of Prelude.Interfaces.Ord, method compare [{e_0},{e_1}] case {e_1} of 
+    # 	| Prelude.Show.User({in_0}) => case {e_0} of 
+    # 	.   | Prelude.Show.User({in_1}) => Prelude.Interfaces.Prelude.Nat.Nat implementation of Prelude.Interfaces.Ord, method compare({in_1}, {in_0})
+    # 	.   | _ => Prelude.Interfaces.Prelude.Interfaces.Integer implementation of Prelude.Interfaces.Ord, method compare(Prelude.Show.precCon({e_0}), Prelude.Show.precCon({e_1}))
+    # 	| _ => Prelude.Interfaces.Prelude.Interfaces.Integer implementation of Prelude.Interfaces.Ord, method compare(Prelude.Show.precCon({e_0}), Prelude.Show.precCon({e_1}))
+
+  # Prelude.Interfaces.Prelude.Show.Prec implementation of Prelude.Interfaces.Ord, method compare
+  # NS (SN (Prelude.Show.Prec implementation of Prelude.Interfaces.Ord, method compare)) (["Interfaces","Prelude"])
+  def i_Prelude_d_Interfaces_d_Prelude_d_Show_d_Prec_s_implementation_s_of_s_Prelude_d_Interfaces_d_Ord_c__s_method_s_compare( e0, e1 ) do
+    aux1 =
+      e1
+    aux2 =
+      case aux1 do
+        {:User, in0} ->
+          aux3 =
+            e0
+          aux4 =
+            case aux3 do
+              {:User, in1} ->
+                i_Prelude_d_Interfaces_d_Prelude_d_Nat_d_Nat_s_implementation_s_of_s_Prelude_d_Interfaces_d_Ord_c__s_method_s_compare( in1, in0 )
+              _ ->
+                i_Prelude_d_Interfaces_d_Prelude_d_Interfaces_d_Integer_s_implementation_s_of_s_Prelude_d_Interfaces_d_Ord_c__s_method_s_compare( i_Prelude_d_Show_d_precCon( e0 ), i_Prelude_d_Show_d_precCon( e1 ) )
+            end
+          aux4
+        _ ->
+          i_Prelude_d_Interfaces_d_Prelude_d_Interfaces_d_Integer_s_implementation_s_of_s_Prelude_d_Interfaces_d_Ord_c__s_method_s_compare( i_Prelude_d_Show_d_precCon( e0 ), i_Prelude_d_Show_d_precCon( e1 ) )
+      end
+    aux2
+  end
+
+    # LFun [Inline] with block in Prelude.Interfaces.Prelude.Show.Prec implementation of Prelude.Interfaces.Ord, method > [{e_0},{e_1},{e_2}] case {e_0} of 
+    # 	| Prelude.Interfaces.GT() => Prelude.Bool.True()
+    # 	| _ => Prelude.Bool.False()
+
+  # with block in Prelude.Interfaces.Prelude.Show.Prec implementation of Prelude.Interfaces.Ord, method >
+  # SN (with block in Prelude.Interfaces.Prelude.Show.Prec implementation of Prelude.Interfaces.Ord, method >)
+  def i_with_s_block_s_in_s_Prelude_d_Interfaces_d_Prelude_d_Show_d_Prec_s_implementation_s_of_s_Prelude_d_Interfaces_d_Ord_c__s_method_s__gt_( e0, _e1, _e2 ) do
+    aux1 =
+      e0
+    aux2 =
+      case aux1 do
+        :GT ->
+            # Prelude.Bool.True()
+            # 0
+          true
+        _ ->
+            # Prelude.Bool.False()
+            # 0
+          false
+      end
+    aux2
+  end
+
+    # LFun [Inline] with block in Prelude.Strings.strM [{e_0},{e_1}] case {e_1} of 
+    # 	| Prelude.Basics.No() => Prelude.Strings.StrNil()
+    # 	| Prelude.Basics.Yes() => Prelude.Strings.StrCons(LStrHead({e_0}))
+
+  # with block in Prelude.Strings.strM
+  # SN (with block in Prelude.Strings.strM)
+  def i_with_s_block_s_in_s_Prelude_d_Strings_d_strM( e0, e1 ) do
+    aux1 =
+      e1
+    aux2 =
+      case aux1 do
+        :No ->
+            # Prelude.Strings.StrNil()
+            # 0
+          :StrNil
+        :Yes ->
+            # Prelude.Strings.StrCons(LStrHead({e_0}))
+            # 1
+          {:StrCons, String.first(e0)}
+      end
+    aux2
+  end
+
+    # LFun [Inline] with block in Prelude.Show.firstCharIs [{e_0},{e_1},{e_2}] case {e_2} of 
+    # 	| Prelude.Strings.StrCons({in_0}) => {e_0}({in_0})
+    # 	| Prelude.Strings.StrNil() => Prelude.Bool.False()
+
+  # with block in Prelude.Show.firstCharIs
+  # SN (with block in Prelude.Show.firstCharIs)
+  def i_with_s_block_s_in_s_Prelude_d_Show_d_firstCharIs( e0, _e1, e2 ) do
+    aux1 =
+      e2
+    aux2 =
+      case aux1 do
+        {:StrCons, in0} ->
+          e0.( in0 )
+        :StrNil ->
+            # Prelude.Bool.False()
+            # 0
+          false
+      end
+    aux2
+  end
+
     # LFun [Inline] case block in io_bind at IO.idr:107:34 [{e_0},{e_1},{e_2},{e_3},{e_4},{e_5},{e_6},{e_7}] {e_7}({e_5})
 
   # case block in io_bind at IO.idr:107:34
@@ -2012,12 +2870,12 @@ defmodule IdrisElixir do
     e7.( e5 )
   end
 
-    # LFun [Inline] Main.case block in main at SumServer.idr:14:15 [{e_0},{e_1},{e_2}] case {e_1} of 
-    # 	| Builtins.MkPair({in_0}, {in_1}) => Prelude.Monad.>>=(____, {e_0}, ____, ____, Prelude.Interactive.putStr'(____, "spawned\n"), Main.{main_SumServer__idr_14_15_case_lam_1}({e_0}, {in_1}))
+    # LFun [Inline] Main.case block in main at SumServer.idr:20:15 [{e_0},{e_1},{e_2}] case {e_1} of 
+    # 	| Builtins.MkPair({in_0}, {in_1}) => Prelude.Monad.>>=(____, {e_0}, ____, ____, Prelude.Interactive.putStr'(____, "spawned\n"), Main.{main_SumServer__idr_20_15_case_lam_2}({e_0}, {in_1}))
 
-  # Main.case block in main at SumServer.idr:14:15
-  # NS (SN (case block in main at SumServer.idr:14:15)) (["Main"])
-  def i_Main_d_case_s_block_s_in_s_main_s_at_s_SumServer_d_idr_colon_14_colon_15( e0, e1, _e2 ) do
+  # Main.case block in main at SumServer.idr:20:15
+  # NS (SN (case block in main at SumServer.idr:20:15)) (["Main"])
+  def i_Main_d_case_s_block_s_in_s_main_s_at_s_SumServer_d_idr_colon_20_colon_15( e0, e1, _e2 ) do
     aux1 =
       e1
     aux2 =
@@ -2025,26 +2883,48 @@ defmodule IdrisElixir do
         { _in0 , in1 } ->
           aux3 =
             i_Prelude_d_Monad_d__gt__gt__eq_( :idris_nothing, e0, :idris_nothing, :idris_nothing )
-          aux3.( i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "spawned\n" ) ).( i_Main_d__lc_main_SumServer__idr_14_15_case_lam_1_rc__partial2( e0, in1 ) )
+          aux3.( i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "spawned\n" ) ).( i_Main_d__lc_main_SumServer__idr_20_15_case_lam_2_rc__partial2( e0, in1 ) )
       end
     aux2
   end
 
-    # LFun [Inline] Main.{main_SumServer__idr_14_15_case_lam_1} [{e_0},{in_1},{in_2}] Prelude.Monad.>>=(____, {e_0}, ____, ____, ElixirFFI.gengencall({in_1}, 2), Main.{main_SumServer__idr_14_15_case_lam_0}())
+    # LFun [Inline] Main.{main_SumServer__idr_20_15_case_lam_2} [{e_0},{in_1},{in_2}] Prelude.Monad.>>=(____, {e_0}, ____, ____, Prelude.Interactive.putStr'(____, LStrConcat(Prelude.Show.primNumShow(____, prim__toStrInt, Prelude.Show.Open(), Main.sumTree(Main.Node(Main.Leaf(9), Main.Leaf(4)))), "\n")), Main.{main_SumServer__idr_20_15_case_lam_1}({e_0}, {in_1}))
 
-  # Main.{main_SumServer__idr_14_15_case_lam_1}
-  # NS (MN (1) (main_SumServer__idr_14_15_case_lam)) (["Main"])
-  def i_Main_d__lc_main_SumServer__idr_14_15_case_lam_1_rc_( e0, in1, _in2 ) do
-    aux1 =
+  # Main.{main_SumServer__idr_20_15_case_lam_2}
+  # NS (MN (2) (main_SumServer__idr_20_15_case_lam)) (["Main"])
+  def i_Main_d__lc_main_SumServer__idr_20_15_case_lam_2_rc_( e0, in1, _in2 ) do
+    aux2 =
+      fn ( aux1 ) ->
+        i_prim__toStrInt( aux1 )
+      end
+      # Prelude.Show.Open()
+      # 0
+      # Main.Leaf(9)
+      # 1
+      # Main.Leaf(4)
+      # 1
+      # Main.Node(Main.Leaf(9), Main.Leaf(4))
+      # 2
+    aux3 =
       i_Prelude_d_Monad_d__gt__gt__eq_( :idris_nothing, e0, :idris_nothing, :idris_nothing )
-    aux1.( i_ElixirFFI_d_gengencall_partial2( in1, 2 ) ).( i_Main_d__lc_main_SumServer__idr_14_15_case_lam_0_rc__partial0(  ) )
+    aux3.( i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, i_Prelude_d_Show_d_primNumShow( :idris_nothing, aux2, :Open, i_Main_d_sumTree( {:Node, {:Leaf, 9}, {:Leaf, 4}} ) ) <> "\n" ) ).( i_Main_d__lc_main_SumServer__idr_20_15_case_lam_1_rc__partial2( e0, in1 ) )
   end
 
-    # LFun [Inline] Main.{main_SumServer__idr_14_15_case_lam_0} [{in_3}] Prelude.Interactive.putStr'(____, "yoyo\n")
+    # LFun [Inline] Main.{main_SumServer__idr_20_15_case_lam_1} [{e_0},{in_1},{in_3}] Prelude.Monad.>>=(____, {e_0}, ____, ____, ElixirFFI.gengencall({in_1}, 2), Main.{main_SumServer__idr_20_15_case_lam_0}())
 
-  # Main.{main_SumServer__idr_14_15_case_lam_0}
-  # NS (MN (0) (main_SumServer__idr_14_15_case_lam)) (["Main"])
-  def i_Main_d__lc_main_SumServer__idr_14_15_case_lam_0_rc_( _in3 ) do
+  # Main.{main_SumServer__idr_20_15_case_lam_1}
+  # NS (MN (1) (main_SumServer__idr_20_15_case_lam)) (["Main"])
+  def i_Main_d__lc_main_SumServer__idr_20_15_case_lam_1_rc_( e0, in1, _in3 ) do
+    aux1 =
+      i_Prelude_d_Monad_d__gt__gt__eq_( :idris_nothing, e0, :idris_nothing, :idris_nothing )
+    aux1.( i_ElixirFFI_d_gengencall_partial2( in1, 2 ) ).( i_Main_d__lc_main_SumServer__idr_20_15_case_lam_0_rc__partial0(  ) )
+  end
+
+    # LFun [Inline] Main.{main_SumServer__idr_20_15_case_lam_0} [{in_4}] Prelude.Interactive.putStr'(____, "yoyo\n")
+
+  # Main.{main_SumServer__idr_20_15_case_lam_0}
+  # NS (MN (0) (main_SumServer__idr_20_15_case_lam)) (["Main"])
+  def i_Main_d__lc_main_SumServer__idr_20_15_case_lam_0_rc_( _in4 ) do
     i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "yoyo\n" )
   end
 
@@ -2178,9 +3058,14 @@ defmodule IdrisElixir do
       i_Main_d__lc_main_0_rc_( givenArg0, restArg0 )
     end
   end
-  def i_Main_d__lc_main_SumServer__idr_14_15_case_lam_0_rc__partial0(  ) do
+  def i_Main_d__lc_main_SumServer__idr_20_15_case_lam_0_rc__partial0(  ) do
     fn ( restArg0 ) ->
-      i_Main_d__lc_main_SumServer__idr_14_15_case_lam_0_rc_( restArg0 )
+      i_Main_d__lc_main_SumServer__idr_20_15_case_lam_0_rc_( restArg0 )
+    end
+  end
+  def i_Prelude_d_Show_d__lc_primNumShow_0_rc__partial0(  ) do
+    fn ( restArg0 ) ->
+      i_Prelude_d_Show_d__lc_primNumShow_0_rc_( restArg0 )
     end
   end
   def i_Prelude_d_Interactive_d__lc_putStr_prime__0_rc__partial0(  ) do
@@ -2193,14 +3078,19 @@ defmodule IdrisElixir do
       i_Main_d__lc_main_1_rc_( restArg0 )
     end
   end
-  def i_Main_d__lc_main_SumServer__idr_14_15_case_lam_1_rc__partial2( givenArg0, givenArg1 ) do
+  def i_Main_d__lc_main_SumServer__idr_20_15_case_lam_1_rc__partial2( givenArg0, givenArg1 ) do
     fn ( restArg0 ) ->
-      i_Main_d__lc_main_SumServer__idr_14_15_case_lam_1_rc_( givenArg0, givenArg1, restArg0 )
+      i_Main_d__lc_main_SumServer__idr_20_15_case_lam_1_rc_( givenArg0, givenArg1, restArg0 )
     end
   end
   def i_Main_d__lc_main_2_rc__partial0(  ) do
     fn ( restArg0 ) ->
       i_Main_d__lc_main_2_rc_( restArg0 )
+    end
+  end
+  def i_Main_d__lc_main_SumServer__idr_20_15_case_lam_2_rc__partial2( givenArg0, givenArg1 ) do
+    fn ( restArg0 ) ->
+      i_Main_d__lc_main_SumServer__idr_20_15_case_lam_2_rc_( givenArg0, givenArg1, restArg0 )
     end
   end
   def i_Main_d__lc_main_3_rc__partial0(  ) do
@@ -2228,19 +3118,44 @@ defmodule IdrisElixir do
       i_Main_d__lc_main_7_rc_( restArg0 )
     end
   end
-  def i_Main_d__lc_main_8_rc__partial0(  ) do
+  def i_Main_d__lc_main_8_rc__partial1( givenArg0 ) do
     fn ( restArg0 ) ->
-      i_Main_d__lc_main_8_rc_( restArg0 )
+      i_Main_d__lc_main_8_rc_( givenArg0, restArg0 )
     end
   end
-  def i_Main_d__lc_main_9_rc__partial1( givenArg0 ) do
+  def i_Main_d__lc_main_9_rc__partial0(  ) do
     fn ( restArg0 ) ->
-      i_Main_d__lc_main_9_rc_( givenArg0, restArg0 )
+      i_Main_d__lc_main_9_rc_( restArg0 )
     end
   end
   def i_Main_d__lc_main_10_rc__partial0(  ) do
     fn ( restArg0 ) ->
       i_Main_d__lc_main_10_rc_( restArg0 )
+    end
+  end
+  def i_Main_d__lc_main_11_rc__partial0(  ) do
+    fn ( restArg0 ) ->
+      i_Main_d__lc_main_11_rc_( restArg0 )
+    end
+  end
+  def i_Main_d__lc_main_12_rc__partial0(  ) do
+    fn ( restArg0 ) ->
+      i_Main_d__lc_main_12_rc_( restArg0 )
+    end
+  end
+  def i_Main_d__lc_main_13_rc__partial1( givenArg0 ) do
+    fn ( restArg0 ) ->
+      i_Main_d__lc_main_13_rc_( givenArg0, restArg0 )
+    end
+  end
+  def i_Main_d__lc_main_14_rc__partial1( givenArg0 ) do
+    fn ( restArg0 ) ->
+      i_Main_d__lc_main_14_rc_( givenArg0, restArg0 )
+    end
+  end
+  def i_Main_d__lc_main_15_rc__partial0(  ) do
+    fn ( restArg0 ) ->
+      i_Main_d__lc_main_15_rc_( restArg0 )
     end
   end
   def io_bind1_partial6( givenArg0, givenArg1, givenArg2, givenArg3, givenArg4, givenArg5 ) do

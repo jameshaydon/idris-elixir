@@ -172,8 +172,6 @@ defFunction name args body =
   $+$ indent body
   $+$ text "end"
 
--- UN-MkUnit
-
 cgCon :: Name -> [Doc] -> Doc
 -- Unit
 cgCon (UN "MkUnit") [] = text "{}"

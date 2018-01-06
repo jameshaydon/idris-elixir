@@ -114,6 +114,56 @@ gengenserver : (init : () -> InitRet state reason) ->
 
 which will spawn an OTP GenServer with init function `init` and `hcall` for the `handle_call` callback.
 
+## FFI
+
+Datatypes are compiled as follows:
+
+| Idris                                                              | Elixir        |
+| ---                                                                | ---           |
+| `() : ()`                                                          | `{}`          |
+| `(x, y) : (a,b)`                                                   | `{x, y}`      |
+| `True, False : Bool`                                               | `true, false` |
+| Idris `List`s and any type using the constructors `Nil` and `(::)` | Elixir lists  |
+| Idris Strings                                                      | Elixir strings |
+
+The constructors of a custom data-type are compiled to tuples whose first item
+is an Elixir atom corresponding to the constructor name.
+
+Example:
+
+```idris
+data Tree a : Type -> Type where
+  Leaf : (x : a) -> Tree a
+  Node : (left : Tree a) -> (right : Tree a) -> Tree a
+```
+
+The idris tree
+
+```idris
+Node (Leaf 42)
+     (Node (Node (Leaf 2)
+                 (Leaf 4))
+           (Leaf 7))
+```
+
+Will compile to the Elixir value:
+
+```elixir
+{:Node, {:Leaf, 42},
+        {:Node, {:Node, {:Leaf, 2},
+                        {:Leaf, 4}},
+                {:Leaf, 7}}}
+```
+
+However constructors with no arguments get turned into simple keywords, so for
+example `Nothing` corresponds to `:Nothing`.
+
+If you are using a datatype with FFI you might need to use the `%used` directive
+to avoid the idris compiler erasing the fields:
+
+```idris
+%used Leaf 
+```
 
 ## Build
 
