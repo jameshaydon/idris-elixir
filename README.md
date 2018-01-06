@@ -162,7 +162,9 @@ If you are using a datatype with FFI you might need to use the `%used` directive
 to avoid the idris compiler erasing the fields:
 
 ```idris
-%used Leaf 
+%used Leaf x
+%used Node left
+%used Node right
 ```
 
 ## Build
@@ -177,3 +179,9 @@ stack build
 cd examples
 stack exec idris -- ex.idr --codegen elixir -o ex.exs
 ```
+
+## TODO
+
+- Make protocol actors
+- Implement FFI functions for the main OTP behaviours
+- The [Elchemy](https://github.com/wende/elchemy) project uses `curry` to make functions curried. `idris-elixir` should do this too.
