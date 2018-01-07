@@ -1,23 +1,18 @@
 module Main where
 
-import Idris.AbsSyntax
-import Idris.CmdOptions
-import Idris.ElabDecls
-import Idris.REPL
-import Idris.Main
-import Idris.ModeCommon
-
-import Idris.Options
-
-import IRTS.Compiler
-import IRTS.CodegenElixir
-
-import System.Environment
-import System.Exit
+import           Idris.AbsSyntax
+import           Idris.ElabDecls
+import           Idris.Main
+import           Idris.Options
+import           IRTS.CodegenElixir
+import           IRTS.Compiler
+import           System.Environment
+import           System.Exit
 
 data Opts = Opts { inputs :: [FilePath],
                    output :: FilePath }
 
+showUsage :: IO b
 showUsage = do putStrLn "Usage: idris-elixir <ibc-files> [-o <output-file>]"
                exitWith ExitSuccess
 
@@ -32,7 +27,7 @@ getOpts = do xs <- getArgs
 
 c_main :: Opts -> Idris ()
 c_main opts = do elabPrims
-                 loadInputs (inputs opts) Nothing
+                 _ <- loadInputs (inputs opts) Nothing
                  mainProg <- elabMain
                  ir <- compile (Via IBCFormat "elixir") (output opts) (Just mainProg)
                  runIO $ codegenElixir ir

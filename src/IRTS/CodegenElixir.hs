@@ -1,13 +1,13 @@
 {-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module IRTS.CodegenElixir(codegenElixir) where
+module IRTS.CodegenElixir(codegenElixir, showName) where
 
-import Data.Monoid
 import           Control.Monad.Trans.State.Lazy
 import           Data.Char
 import           Data.List
 import qualified Data.Map                       as M
+import           Data.Monoid
 import qualified Data.Set                       as S
 import qualified Data.Text                      as T
 import           Idris.Core.TT
@@ -17,7 +17,7 @@ import           Util.PrettyPrint
 
 data DefState = DefState
   { fullArity    :: Int
-  , partialsUsed :: S.Set Int
+  --, partialsUsed :: S.Set Int
   } deriving (Show)
 
 -- Codegen state within one Decl
@@ -48,22 +48,22 @@ getDefState n = do
   s <- get
   pure (M.lookup n (defs s))
 
-recordPartialUse :: Name -> Int -> State CGState ()
-recordPartialUse f n = do
-  s <- get
-  let ds = defs s
-  case M.lookup f ds of
-    Nothing -> pure () -- TODO: throw an exception here?
-    Just defS -> do
-      let partials = S.insert n (partialsUsed defS)
-      put $ s { defs = M.insert f (defS { partialsUsed = partials }) ds }
+-- recordPartialUse :: Name -> Int -> State CGState ()
+-- recordPartialUse f n = do
+--   s <- get
+--   let ds = defs s
+--   case M.lookup f ds of
+--     Nothing -> pure () -- TODO: throw an exception here?
+--     Just defS -> do
+--       let partials = S.insert n (partialsUsed defS)
+--       put $ s { defs = M.insert f (defS { partialsUsed = partials }) ds }
 
 indent :: Doc -> Doc
 indent = nest 2
 
 makeDefsState :: [(Name, LDecl)] -> M.Map Name DefState
 makeDefsState ds = M.fromList
-  [ (n, DefState (length args) S.empty) | (n,d) <- ds, args <- isFun d ]
+  [ (n, DefState (length args)) | (n,d) <- ds, args <- isFun d ]
   where
     isFun (LFun _ _ args _) = [args]
     isFun _                 = []
@@ -72,7 +72,7 @@ codegenElixir :: CodeGenerator
 codegenElixir ci = do
   let definitions = liftDecls ci
   let initState = CGState 1 (makeDefsState definitions)
-  let (ds, st) = runState (traverse elixirDef definitions) initState
+  let (ds, _) = runState (traverse elixirDef definitions) initState
   let elixirDefs = vcat ds
   -- let partials = makePartials st
   let f =     topComment
@@ -89,27 +89,27 @@ codegenElixir ci = do
     topComment = text "# This file was compiled by idris-elixir."
     start = text "IdrisElixir.runMain0()"
 
-makePartials :: CGState -> Doc
-makePartials st =
-    let ds = filter hasPartials (M.toList (defs st))
-        ps = makePartialsFor <$> ds
-    in vcat ps
-  where
-    hasPartials (_, DefState { partialsUsed }) = not $ S.null partialsUsed
+-- makePartials :: CGState -> Doc
+-- makePartials st =
+--     let ds = filter hasPartials (M.toList (defs st))
+--         ps = makePartialsFor <$> ds
+--     in vcat ps
+--   where
+--     hasPartials (_, DefState { partialsUsed }) = not $ S.null partialsUsed
 
-    makePartialsFor (name, DefState { fullArity, partialsUsed }) =
-      vcat [ makePartial (cgName name) fullArity numArgs | numArgs <- S.toList partialsUsed ]
+--     makePartialsFor (name, DefState { fullArity, partialsUsed }) =
+--       vcat [ makePartial (cgName name) fullArity numArgs | numArgs <- S.toList partialsUsed ]
 
-    givenArgs n = text <$> [ "givenArg" ++ show i | i <- [0..(n - 1)]]
-    restArgs  n = text <$> [ "restArg"  ++ show i | i <- [0..(n - 1)]]
+--     givenArgs n = text <$> [ "givenArg" ++ show i | i <- [0..(n - 1)]]
+--     restArgs  n = text <$> [ "restArg"  ++ show i | i <- [0..(n - 1)]]
 
-    makePartial name full numArgs =
-      let givens = givenArgs numArgs
-          rest   = restArgs (full - numArgs)
-      in defFunction
-          (name <> text "_partial" <> text (show numArgs))
-          givens
-          (defLambda rest (defFunApp name (givens ++ rest)))
+--     makePartial name full numArgs =
+--       let givens = givenArgs numArgs
+--           rest   = restArgs (full - numArgs)
+--       in defFunction
+--           (name <> text "_partial" <> text (show numArgs))
+--           givens
+--           (defLambda rest (defFunApp name (givens ++ rest)))
 
 -- Let's not mangle /that/ much. Especially function parameters
 -- like e0 and e1 are nicer when readable.
@@ -168,10 +168,10 @@ cgCon name args =
 
 showName :: Name -> String
 showName n = case n of
-  UN t -> "UN (" ++ T.unpack t ++ ")"
+  UN t     -> "UN (" ++ T.unpack t ++ ")"
   NS n' ts -> "NS (" ++ showName n' ++ ") (" ++ show (T.unpack <$> ts) ++ ")"
-  MN i t -> "MN (" ++ show i ++ ") (" ++ T.unpack t ++ ")"
-  SN sn -> "SN (" ++ show sn ++ ")"
+  MN i t   -> "MN (" ++ show i ++ ") (" ++ T.unpack t ++ ")"
+  SN sn    -> "SN (" ++ show sn ++ ")"
   SymRef i -> "SymRef (" ++ show i ++ ")"
 
 usedArgumentList :: [Name] -> LExp -> [Doc]
@@ -183,7 +183,7 @@ elixirDef :: (Name, LDecl) -> State CGState Doc
 elixirDef (name, decl) = do
   resetVarCounter
   case decl of
-    con@LConstructor{} -> pure $
+    LConstructor{} -> pure $
       --     text "#" <+> text (showName name)
       -- $+$ multiLineComment (show con)
       -- $+$ text ""
@@ -204,23 +204,27 @@ elixirDef (name, decl) = do
 
 usedArgs :: LExp -> S.Set Name
 usedArgs e = case e of
-  LV (Glob n) -> S.singleton n
-  LApp _ f xs -> usedArgs f <> foldMap usedArgs xs
-  LLazyApp f xs -> foldMap usedArgs xs
-  LForce e -> usedArgs e
-  LLet n x y -> usedArgs x <> usedArgs y
-  LProj e _ -> usedArgs e
-  LCon _ _ _ xs -> foldMap usedArgs xs
-  LCase _ e as -> usedArgs e <> foldMap frAlt as
-  LConst _ -> S.empty
+  LV n            -> S.singleton n
+  LApp _ f xs     -> usedArgs f <> foldMap usedArgs xs
+  LLazyApp f xs   -> S.singleton f <> foldMap usedArgs xs
+  LForce x        -> usedArgs x
+  LLet _ x y      -> usedArgs x <> usedArgs y
+  LProj x _       -> usedArgs x
+  LCon _ _ _ xs   -> foldMap usedArgs xs
+  LCase _ x as    -> usedArgs x <> foldMap frAlt as
+  LConst _        -> S.empty
   LForeign _ _ xs -> foldMap usedArgs (snd <$> xs)
-  LOp primFn xs -> foldMap usedArgs xs
-  LNothing -> S.empty
-  LError e -> S.empty
+  LOp _ xs   -> foldMap usedArgs xs
+  LNothing        -> S.empty
+  LError _        -> S.empty
+  -- The following are lifted so shouldn't ever be hit.
+  LLam _ _ -> errLifted
+  LLazyExp _ -> errLifted
   where
-    frAlt (LConCase _ _ _ e) = usedArgs e
-    frAlt (LConstCase _ e) = usedArgs e
-    frAlt (LDefaultCase e) = usedArgs e
+    frAlt (LConCase _ _ _ x) = usedArgs x
+    frAlt (LConstCase _ x)   = usedArgs x
+    frAlt (LDefaultCase x)   = usedArgs x
+    errLifted = error "Encountered LExp form which should have been lifted prior to this compilation step."
 
 cgAssign :: Doc -> Expr -> Stmts
 cgAssign v e =
@@ -243,12 +247,11 @@ fnApp f (x:xs) = fnApp (fnApp f [x]) xs
 
 cgBody :: LExp -> State CGState (Stmts, Expr)
 cgBody body = case body of
-  LV v@(Glob f) -> do
-    ds_ <- getDefState f
+  LV v -> do
+    ds_ <- getDefState v
     case ds_ of
-      Nothing -> pure (empty, cgVar v)
-      Just ds -> pure (empty, cgVar v <> text "()")
-  LV v -> pure (empty, cgVar v)
+      Nothing -> pure (empty, cgName v)
+      Just _ -> pure (empty, cgName v <> text "()")
   LCase _ e@(LOp _ [_, _]) [LConstCase (I 0) whenFalse, LDefaultCase whenTrue] -> do
     ifElseV <- fresh
     (scrutStmts, scrut) <- cgBody e
@@ -262,10 +265,10 @@ cgBody body = case body of
     pure (scrutStmts $+$ cgAssign (cgVar ifElseV) b, cgVar ifElseV)
   LCase _ e alts -> do
     (preStmts, scrut) <- case e of
-      x@(LV v) -> cgBody x
-      e -> do
+      x@(LV _) -> cgBody x
+      x -> do
         scrutV <- fresh
-        (scrutStmts, scrut) <- cgBody e
+        (scrutStmts, scrut) <- cgBody x
         pure (scrutStmts $+$ cgAssign (cgVar scrutV) scrut, cgVar scrutV)
     caseVar <- fresh
     as <- traverse cgAlt alts
@@ -284,7 +287,7 @@ cgBody body = case body of
   --         $+$ indent (cgVar x <+> text "->" <+> [cgVar x])
   --         $+$ text "end"
   --   pure (stmts $+$ cgAssign (cgVar r) e, cgVar r)
-  LApp _ (LV (Glob f)) args -> do
+  LApp _ (LV f) args -> do
     xs <- traverse prepArg args
     let stmts = vcat (fst <$> xs)
     let argEs = snd <$> xs
@@ -317,9 +320,9 @@ cgBody body = case body of
     --   xs <- traverse cgBody args
     --   pure (ss $+$ vcat (fst <$> xs), fnApp f (snd <$> xs))
   LLazyApp n args -> do
-      (ss, b) <- cgBody (LApp False (LV (Glob n)) args)
+      (ss, b) <- cgBody (LApp False (LV n) args)
       pure (ss, text "Idrislib.LazyVal.new(" <> thunk (ss $+$ b) <> text ")")
-  LForce (LLazyApp n args) -> cgBody (LApp False (LV (Glob n)) args)
+  LForce (LLazyApp n args) -> cgBody (LApp False (LV n) args)
   LForce e -> do
     (ss, b) <- cgBody e
     pure (ss, text "Idrislib.LazyVal.force(" <> b <> text ")")
@@ -331,7 +334,7 @@ cgBody body = case body of
                 $+$ ss'
     pure (stmts, eb)
   LProj _ _ -> pure (empty, text "UNIM PROJ")
-  c@(LCon _ _ n es) -> do
+  LCon _ _ n es -> do
     xs <- traverse cgBody es
     let ss = (vcat $ fst <$> xs) -- $+$ (multiLineComment (show c ++ "\n" ++ show (length es)))
     pure (ss, cgCon n (snd <$> xs))
@@ -349,7 +352,7 @@ cgBody body = case body of
 -- | Arguments which are references to global functions need to be made into
 -- lambdas.
 prepArg :: LExp -> State CGState (Stmts, Expr)
-prepArg (LV (Glob f)) = do
+prepArg (LV f) = do
   ds_ <- getDefState f
   case ds_ of
     Just ds -> do
@@ -358,7 +361,7 @@ prepArg (LV (Glob f)) = do
       funV <- fresh
       let fun = defLambda xs' (defFunApp (cgName f) xs')
       pure ( cgAssign (cgVar funV) fun, cgVar funV )
-    Nothing -> cgBody (LV (Glob f))
+    Nothing -> cgBody (LV f)
 prepArg x = cgBody x
 
 cgAlt :: LAlt -> State CGState Expr
@@ -426,6 +429,7 @@ cgConst c = text $ case c of
   Str s -> show s
   _     -> "raise(\"!UNIM! constant: " ++ show c ++ "\""
 
+elixirChar :: String -> Char -> String
 elixirChar dot x = case x of
       '.' -> dot
       '_' -> "_"

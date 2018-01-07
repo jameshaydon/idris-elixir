@@ -1,8 +1,8 @@
-resolver: lts-10.1
+resolver: lts-10.2
 
 packages:
 - .
 
 extra-deps:
-  - idris-1.1.1
-  - ansi-terminal-0.6.3.1
+  - idris-1.2.0
+  # - ansi-terminal-0.6.3.1
