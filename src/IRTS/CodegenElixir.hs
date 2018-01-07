@@ -76,7 +76,6 @@ codegenElixir ci = do
   let elixirDefs = vcat ds
   -- let partials = makePartials st
   let f =     topComment
-          $+$ helperModule
           $+$ text ""
           $+$ text "defmodule IdrisElixir do"
           $+$ indent (text "import Idrislib")
@@ -111,33 +110,6 @@ makePartials st =
           (name <> text "_partial" <> text (show numArgs))
           givens
           (defLambda rest (defFunApp name (givens ++ rest)))
-
-helperModule :: Doc
-helperModule = vcat . fmap text $
-  [ "defmodule IdrisRts do"
-  , "  def force(x) do"
-  , "    case x do"
-  , "      {:idris_lazy, _, val} -> val"
-  , "      {:idris_lazy, thunk} -> thunk.()"
-  , "      _ -> x"
-  , "    end"
-  , "  end"
-  , ""
-  , "  def receive_any() do"
-  , "    receive do"
-  , "      x -> x"
-  , "    end"
-  , "  end"
-  , ""
-  , "  def spawn_idris(f) do"
-  , "    spawn(fn () -> f.(:idris_nothing) end)"
-  , "  end"
-  , ""
-  -- , "  def send_any(pid, x) do"
-  -- , "    send(pid, x)"
-  -- , "  end"
-  , "end"
-  ]
 
 -- Let's not mangle /that/ much. Especially function parameters
 -- like e0 and e1 are nicer when readable.
@@ -346,11 +318,11 @@ cgBody body = case body of
     --   pure (ss $+$ vcat (fst <$> xs), fnApp f (snd <$> xs))
   LLazyApp n args -> do
       (ss, b) <- cgBody (LApp False (LV (Glob n)) args)
-      pure (ss, text "{:idris_lazy, " <> thunk (ss $+$ b) <> text "}")
+      pure (ss, text "Idrislib.LazyVal.new(" <> thunk (ss $+$ b) <> text ")")
   LForce (LLazyApp n args) -> cgBody (LApp False (LV (Glob n)) args)
   LForce e -> do
     (ss, b) <- cgBody e
-    pure (ss, text "IdrisRts.force(" <> b <> text ")")
+    pure (ss, text "Idrislib.LazyVal.force(" <> b <> text ")")
   LLet n x e -> do
     (ss , xb) <- cgBody x
     (ss', eb) <- cgBody e

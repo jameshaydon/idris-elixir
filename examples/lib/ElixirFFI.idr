@@ -38,13 +38,13 @@ elxcall : (fname : String) -> (ty : Type) ->
 elxcall fname ty = foreign FFI_Elx fname ty
 
 spawnPtr : Ptr -> EIO Ptr
-spawnPtr p = elxcall "IdrisRts.spawn_idris" (Ptr -> EIO Ptr) p
+spawnPtr p = elxcall "Idrislib.spawn_idris" (Ptr -> EIO Ptr) p
 
 unsafeSpawn : (EIO ()) -> EIO Ptr
 unsafeSpawn f = spawnPtr (believe_me f)
 
 receivePtr : EIO Ptr
-receivePtr = elxcall "IdrisRts.receive_any" (EIO Ptr)
+receivePtr = elxcall "Idrislib.receive_any" (EIO Ptr)
 
 unsafeReceive : EIO a
 unsafeReceive = do

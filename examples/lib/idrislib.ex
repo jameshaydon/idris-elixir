@@ -1,5 +1,65 @@
 defmodule Idrislib do
 
+  def receive_any() do
+    receive do
+      x -> x
+    end
+  end
+
+  def spawn_idris(f) do
+    spawn(fn () -> f.(:idris_nothing) end)
+  end
+
+  defmodule Atom do
+
+    def new(value) do
+      {:ok, pid} = Agent.start_link(fn -> value end)
+      pid
+    end
+
+    def deref({:atom, pid}) do
+      Agent.get(pid, fn value -> value end)
+    end
+
+    def reset!({:atom, pid}, new_value) do
+      Agent.update(pid, fn _ -> new_value end)
+      new_value
+    end
+
+    def swap!({:atom, pid}, func) do
+      Agent.get_and_update(pid, fn state ->
+        new = func.(state)
+        {new, new}
+      end)
+    end
+  end
+
+  defmodule LazyVal do
+
+    def new(thunk) do
+      pid = Atom.new({:thunk, thunk})
+      {:lazy, pid}
+    end
+
+    def force({:lazy, pid}) do
+      forcer =
+        fn
+          {:thunk, thunk} -> {:forced, thunk.()}
+          x -> x
+        end
+      case Atom.swap!({:atom, pid}, forcer) do
+        {:forced, val} -> val
+      end
+    end
+
+    def force(x) do
+      x
+    end
+
+  end
+
+  # Curry utilities
+
   defmacro curry({:/, _, [{name, _, _}, arity]}, opts \\ []) do
     lambdas = opts[:lambdas] || []
     args =

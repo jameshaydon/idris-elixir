@@ -1,24 +1,4 @@
 # This file was compiled by idris-elixir.
-defmodule IdrisRts do
-  def force(x) do
-    case x do
-      {:idris_lazy, _, val} -> val
-      {:idris_lazy, thunk} -> thunk.()
-      _ -> x
-    end
-  end
-
-  def receive_any() do
-    receive do
-      x -> x
-    end
-  end
-
-  def spawn_idris(f) do
-    spawn(fn () -> f.(:idris_nothing) end)
-  end
-
-end
 
 defmodule IdrisElixir do
   import Idrislib
@@ -31,7 +11,7 @@ defmodule IdrisElixir do
         false ->
           false
         true ->
-          IdrisRts.force(e1)
+          Idrislib.LazyVal.force(e1)
       end
     aux1
   end
@@ -49,6 +29,17 @@ defmodule IdrisElixir do
     aux1
   end
 
+  # Prelude.Applicative.<*>
+  curry i_Prelude_d_Applicative_d__lt__42__gt_/4
+  def i_Prelude_d_Applicative_d__lt__42__gt_( _e0, e1, e2, e3 ) do
+    aux1 =
+      case e1 do
+        {:"constructor_s_of_s_Prelude.Applicative.Applicative", _in0, in1} ->
+          in1.( e2 ).( e3 )
+      end
+    aux1
+  end
+
   # Prelude.Algebra.<+>
   curry i_Prelude_d_Algebra_d__lt__plus__gt_/2
   def i_Prelude_d_Algebra_d__lt__plus__gt_( _e0, e1 ) do
@@ -58,7 +49,7 @@ defmodule IdrisElixir do
   # Force
   curry i_Force/3
   def i_Force( _e0, _e1, e2 ) do
-    IdrisRts.force(e2)
+    Idrislib.LazyVal.force(e2)
   end
 
   # PE_concatMap_8faac41f
@@ -98,73 +89,6 @@ defmodule IdrisElixir do
     e2.( :idris_nothing )
   end
 
-  # Prelude.Applicative.empty
-  curry i_Prelude_d_Applicative_d_empty/3
-  def i_Prelude_d_Applicative_d_empty( _e0, e1, e2 ) do
-    aux1 =
-      case e1 do
-        {:"constructor_s_of_s_Prelude.Applicative.Alternative", _in0, in1} ->
-          in1.( e2 )
-      end
-    aux1
-  end
-
-  # Main.exampleTree
-  def i_Main_d_exampleTree(  ) do
-    {:Node, {:Node, {:Node, {:Tip, 1}, {:Tip, 2}}, {:Tip, 3}}, {:Node, {:Tip, 4}, {:Node, {:Tip, 5}, {:Tip, 6}}}}
-  end
-
-  # Main.fifi
-  curry i_Main_d_fifi/1
-  def i_Main_d_fifi( e0 ) do
-    aux1 =
-      case e0 do
-        [ in0 | in1 ] ->
-          in0 + i_Main_d_fifi( in1 )
-        [] ->
-          0
-      end
-    aux1
-  end
-
-  # Main.foldTree
-  curry i_Main_d_foldTree/5
-  def i_Main_d_foldTree( _e0, _e1, e2, e3, e4 ) do
-    aux1 =
-      case e4 do
-        {:Node, in0, in1} ->
-          e3.( i_Main_d_foldTree( :idris_nothing, :idris_nothing, e2, e3, in0 ) ).( i_Main_d_foldTree( :idris_nothing, :idris_nothing, e2, e3, in1 ) )
-        {:Tip, in2} ->
-          e2.( in2 )
-      end
-    aux1
-  end
-
-  # Prelude.Applicative.guard
-  curry i_Prelude_d_Applicative_d_guard/3
-  def i_Prelude_d_Applicative_d_guard( _e0, e1, e2 ) do
-    aux1 =
-      case e2 do
-        false ->
-          aux2 =
-            case e1 do
-              {:"constructor_s_of_s_Prelude.Applicative.Alternative", _in0, in1} ->
-                in1.( :idris_nothing )
-            end
-          aux2
-        true ->
-          aux3 =
-            case e1 do
-              {:"constructor_s_of_s_Prelude.Applicative.Alternative", in2, _in3} ->
-                in2
-            end
-          aux4 =
-            i_Prelude_d_Applicative_d_pure( :idris_nothing, aux3, :idris_nothing )
-          aux4.( {} )
-      end
-    aux1
-  end
-
   # Prelude.Basics.id
   curry i_Prelude_d_Basics_d_id/2
   def i_Prelude_d_Basics_d_id( _e0, e1 ) do
@@ -182,11 +106,16 @@ defmodule IdrisElixir do
     aux1 =
       case e1 do
         false ->
-          IdrisRts.force(e3)
+          Idrislib.LazyVal.force(e3)
         true ->
-          IdrisRts.force(e2)
+          Idrislib.LazyVal.force(e2)
       end
     aux1
+  end
+
+  # Main.initState
+  def i_Main_d_initState(  ) do
+    i_Prelude_d_Prelude_d_Int_s_implementation_s_of_s_Prelude_d_Enum_c__s_method_s_enumFromTo( 1, 3 )
   end
 
   # Prelude.Interfaces.intToBool
@@ -236,86 +165,49 @@ defmodule IdrisElixir do
     e2
   end
 
-  # Prelude.List.length
-  curry i_Prelude_d_List_d_length/2
-  def i_Prelude_d_List_d_length( _e0, e1 ) do
+  # Main.loop
+  curry i_Main_d_loop/1
+  def i_Main_d_loop( e0 ) do
+    {:Bind, :Recv, i_Main_d__lc_loop_2_rc_().( e0 )}
+  end
+
+  # Main.{loop_2}
+  curry i_Main_d__lc_loop_2_rc_/2
+  def i_Main_d__lc_loop_2_rc_( e0, in0 ) do
     aux1 =
-      case e1 do
-        [ _in0 | in1 ] ->
-          1 + i_Prelude_d_List_d_length( :idris_nothing, in1 )
-        [] ->
-          0
+      case in0 do
+        {:GetFreq, in1} ->
+          aux2 =
+            case e0 do
+              [ in2 | in3 ] ->
+                {:Bind, {:Send, in1, {:Freq, in2}}, i_Main_d__lc_loop_0_rc_().( in3 )}
+              [] ->
+                {:Bind, {:Send, in1, :NoneFree}, i_Main_d__lc_loop_1_rc_()}
+            end
+          aux2
+        {:RetFreq, in6} ->
+          i_Main_d_loop( [ in6 | e0 ] )
       end
     aux1
   end
 
+  # Main.{loop_1}
+  curry i_Main_d__lc_loop_1_rc_/1
+  def i_Main_d__lc_loop_1_rc_( _in5 ) do
+    i_Main_d_loop( [] )
+  end
+
+  # Main.{loop_0}
+  curry i_Main_d__lc_loop_0_rc_/2
+  def i_Main_d__lc_loop_0_rc_( in3, _in4 ) do
+    i_Main_d_loop( in3 )
+  end
+
   # Main.main
   def i_Main_d_main(  ) do
-    aux2 =
-      fn ( aux1 ) ->
-        i_prim__toStrInt( aux1 )
-      end
-    i_io_bind().( :idris_nothing ).( :idris_nothing ).( :idris_nothing ).( i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "Should be 55: " <> i_Prelude_d_Show_d_primNumShow( :idris_nothing, aux2, :Open, i_Main_d_fifi( i_Prelude_d_Prelude_d_Int_s_implementation_s_of_s_Prelude_d_Enum_c__s_method_s_enumFromTo( 1, 10 ) ) ) <> "\n" ) ).( i_Main_d__lc_main_6_rc_() )
-  end
-
-  # Main.{main_6}
-  curry i_Main_d__lc_main_6_rc_/1
-  def i_Main_d__lc_main_6_rc_( _in0 ) do
-    aux2 =
-      fn ( aux1 ) ->
-        i_prim__toStrInt( aux1 )
-      end
-    aux3 =
-      i_Main_d_exampleTree(  )
-    i_io_bind().( :idris_nothing ).( :idris_nothing ).( :idris_nothing ).( i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "Should be 21: " <> i_Prelude_d_Show_d_primNumShow( :idris_nothing, aux2, :Open, i_Main_d_foldTree( :idris_nothing, :idris_nothing, i_Prelude_d_Basics_d_id().( :idris_nothing ), i_Main_d__lc_main_1_rc_(), aux3 ) ) <> "\n" ) ).( i_Main_d__lc_main_5_rc_() )
-  end
-
-  # Main.{main_5}
-  curry i_Main_d__lc_main_5_rc_/1
-  def i_Main_d__lc_main_5_rc_( _in3 ) do
     aux1 =
-      i_Main_d_exampleTree(  )
-    aux2 =
-      i_Main_d_tips( :idris_nothing )
-    i_io_bind().( :idris_nothing ).( :idris_nothing ).( :idris_nothing ).( i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "Should be " <> i_Prelude_d_Show_d_Prelude_d_Show_d_List_s_a_s_implementation_s_of_s_Prelude_d_Show_d_Show_c__s_method_s_show( :idris_nothing, i_Main_d__lc_main_2_rc_(), i_Prelude_d_Prelude_d_Integer_s_implementation_s_of_s_Prelude_d_Enum_c__s_method_s_enumFromTo( 1, 6 ) ) <> ": " <> i_Prelude_d_Show_d_Prelude_d_Show_d_List_s_a_s_implementation_s_of_s_Prelude_d_Show_d_Show_c__s_method_s_show( :idris_nothing, i_Main_d__lc_main_3_rc_(), aux2.( aux1 ) ) <> "\n" ) ).( i_Main_d__lc_main_4_rc_() )
-  end
-
-  # Main.{main_4}
-  curry i_Main_d__lc_main_4_rc_/1
-  def i_Main_d__lc_main_4_rc_( _in6 ) do
-    i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "Should be 20: " <> i_Prelude_d_Show_d_Prelude_d_Show_d_Nat_s_implementation_s_of_s_Prelude_d_Show_d_Show_c__s_method_s_show( i_Prelude_d_List_d_length( :idris_nothing, i_Main_d_pythag( 50 ) ) ) <> "\n" )
-  end
-
-  # Main.{main_3}
-  curry i_Main_d__lc_main_3_rc_/1
-  def i_Main_d__lc_main_3_rc_( in5 ) do
-    aux2 =
-      fn ( aux1 ) ->
-        i_prim__toStrInt( aux1 )
-      end
-    i_Prelude_d_Show_d_primNumShow( :idris_nothing, aux2, :Open, in5 )
-  end
-
-  # Main.{main_2}
-  curry i_Main_d__lc_main_2_rc_/1
-  def i_Main_d__lc_main_2_rc_( in4 ) do
-    aux2 =
-      fn ( aux1 ) ->
-        i_prim__toStrBigInt( aux1 )
-      end
-    i_Prelude_d_Show_d_primNumShow( :idris_nothing, aux2, :Open, in4 )
-  end
-
-  # Main.{main_1}
-  curry i_Main_d__lc_main_1_rc_/1
-  def i_Main_d__lc_main_1_rc_( in1 ) do
-    i_Main_d__lc_main_0_rc_().( in1 )
-  end
-
-  # Main.{main_0}
-  curry i_Main_d__lc_main_0_rc_/2
-  def i_Main_d__lc_main_0_rc_( in1, in2 ) do
-    in1 + in2
+      i_Main_d_tester(  )
+    i_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, aux1 )
   end
 
   # mkForeignPrim
@@ -334,6 +226,77 @@ defmodule IdrisElixir do
           false
       end
     aux1
+  end
+
+  # Main.phone
+  curry i_Main_d_phone/3
+  def i_Main_d_phone( e0, e1, e2 ) do
+    {:Bind, :Self, i_Main_d__lc_phone_8_rc_().( e1 ).( e0 ).( e2 )}
+  end
+
+  # Main.{phone_8}
+  curry i_Main_d__lc_phone_8_rc_/4
+  def i_Main_d__lc_phone_8_rc_( e1, e0, e2, in0 ) do
+    {:Bind, {:Send, e1, {:GetFreq, in0}}, i_Main_d__lc_phone_7_rc_().( e0 ).( e1 ).( e2 )}
+  end
+
+  # Main.{phone_7}
+  curry i_Main_d__lc_phone_7_rc_/4
+  def i_Main_d__lc_phone_7_rc_( e0, e1, e2, _in1 ) do
+    {:Bind, :Recv, i_Main_d__lc_phone_6_rc_().( e0 ).( e1 ).( e2 )}
+  end
+
+  # Main.{phone_6}
+  curry i_Main_d__lc_phone_6_rc_/4
+  def i_Main_d__lc_phone_6_rc_( e0, e1, e2, in2 ) do
+    aux1 =
+      case in2 do
+        {:Freq, in3} ->
+          aux3 =
+            fn ( aux2 ) ->
+              i_prim__toStrInt( aux2 )
+            end
+          {:Bind, {:LiftIO, i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "phone " <> e0 <> " got a frequency: " <> i_Prelude_d_Show_d_primNumShow( :idris_nothing, aux3, :Open, in3 ) <> "\n" )}, i_Main_d__lc_phone_3_rc_().( e1 ).( in3 ).( e0 ).( e2 )}
+        _ ->
+          {:Bind, {:LiftIO, i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "phone " <> e0 <> " couldn't get frequency!" <> "\n" )}, i_Main_d__lc_phone_5_rc_().( e0 ).( e1 ).( e2 )}
+      end
+    aux1
+  end
+
+  # Main.{phone_5}
+  curry i_Main_d__lc_phone_5_rc_/4
+  def i_Main_d__lc_phone_5_rc_( e0, e1, e2, _in8 ) do
+    {:Bind, {:LiftIO, i_ElixirFFI_d_sleep().( 1000 )}, i_Main_d__lc_phone_4_rc_().( e0 ).( e1 ).( e2 )}
+  end
+
+  # Main.{phone_4}
+  curry i_Main_d__lc_phone_4_rc_/4
+  def i_Main_d__lc_phone_4_rc_( e0, e1, e2, _in9 ) do
+    i_Main_d_phone( e0, e1, e2 )
+  end
+
+  # Main.{phone_3}
+  curry i_Main_d__lc_phone_3_rc_/5
+  def i_Main_d__lc_phone_3_rc_( e1, in3, e0, e2, _in4 ) do
+    {:Bind, {:LiftIO, i_ElixirFFI_d_sleep().( 1500 )}, i_Main_d__lc_phone_2_rc_().( e1 ).( in3 ).( e0 ).( e2 )}
+  end
+
+  # Main.{phone_2}
+  curry i_Main_d__lc_phone_2_rc_/5
+  def i_Main_d__lc_phone_2_rc_( e1, in3, e0, e2, _in5 ) do
+    {:Bind, {:Send, e1, {:RetFreq, in3}}, i_Main_d__lc_phone_1_rc_().( e0 ).( e2 )}
+  end
+
+  # Main.{phone_1}
+  curry i_Main_d__lc_phone_1_rc_/3
+  def i_Main_d__lc_phone_1_rc_( e0, e2, _in6 ) do
+    {:Bind, {:LiftIO, i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "phone " <> e0 <> " has finished calling." <> "\n" )}, i_Main_d__lc_phone_0_rc_().( e2 )}
+  end
+
+  # Main.{phone_0}
+  curry i_Main_d__lc_phone_0_rc_/2
+  def i_Main_d__lc_phone_0_rc_( e2, _in7 ) do
+    {:Send, e2, {}}
   end
 
   # Prelude.Show.precCon
@@ -426,12 +389,6 @@ defmodule IdrisElixir do
     op0 + op1
   end
 
-  # prim__addInt
-  curry i_prim__addInt/2
-  def i_prim__addInt( op0, op1 ) do
-    op0 + op1
-  end
-
   # prim__asPtr
   curry i_prim__asPtr/1
   def i_prim__asPtr( op0 ) do
@@ -478,12 +435,6 @@ defmodule IdrisElixir do
   curry i_prim__eqString/2
   def i_prim__eqString( op0, op1 ) do
     op0 == op1
-  end
-
-  # prim__mulInt
-  curry i_prim__mulInt/2
-  def i_prim__mulInt( op0, op1 ) do
-    op0 * op1
   end
 
   # prim__null
@@ -700,7 +651,12 @@ defmodule IdrisElixir do
   # Prelude.Applicative.pure
   curry i_Prelude_d_Applicative_d_pure/3
   def i_Prelude_d_Applicative_d_pure( _e0, e1, e2 ) do
-    e1.( e2 )
+    aux1 =
+      case e1 do
+        {:"constructor_s_of_s_Prelude.Applicative.Applicative", in0, _in1} ->
+          in0.( e2 )
+      end
+    aux1
   end
 
   # Prelude.Interactive.putStr'
@@ -715,58 +671,70 @@ defmodule IdrisElixir do
     i_io_pure().( :idris_nothing ).( :idris_nothing ).( {} )
   end
 
-  # Main.pythag
-  curry i_Main_d_pythag/1
-  def i_Main_d_pythag( e0 ) do
-    i_Prelude_d_Monad_d_Prelude_d_List_s_implementation_s_of_s_Prelude_d_Monad_d_Monad_c__s_method_s__gt__gt__eq_( :idris_nothing, :idris_nothing, i_Prelude_d_Prelude_d_Int_s_implementation_s_of_s_Prelude_d_Enum_c__s_method_s_enumFromTo( 1, e0 ), i_Main_d__lc_pythag_6_rc_() )
+  # ElixirFFI.receivePtr
+  curry i_ElixirFFI_d_receivePtr/1
+  def i_ElixirFFI_d_receivePtr( _i_w ) do
+    Idrislib.receive_any(  )
   end
 
-  # Main.{pythag_6}
-  curry i_Main_d__lc_pythag_6_rc_/1
-  def i_Main_d__lc_pythag_6_rc_( in0 ) do
-    i_Prelude_d_Monad_d_Prelude_d_List_s_implementation_s_of_s_Prelude_d_Monad_d_Monad_c__s_method_s__gt__gt__eq_( :idris_nothing, :idris_nothing, i_Prelude_d_Prelude_d_Int_s_implementation_s_of_s_Prelude_d_Enum_c__s_method_s_enumFromTo( 1, in0 ), i_Main_d__lc_pythag_5_rc_().( in0 ) )
-  end
-
-  # Main.{pythag_5}
-  curry i_Main_d__lc_pythag_5_rc_/2
-  def i_Main_d__lc_pythag_5_rc_( in0, in1 ) do
-    i_Prelude_d_Monad_d_Prelude_d_List_s_implementation_s_of_s_Prelude_d_Monad_d_Monad_c__s_method_s__gt__gt__eq_( :idris_nothing, :idris_nothing, i_Prelude_d_Prelude_d_Int_s_implementation_s_of_s_Prelude_d_Enum_c__s_method_s_enumFromTo( 1, in1 ), i_Main_d__lc_pythag_4_rc_().( in1 ).( in0 ) )
-  end
-
-  # Main.{pythag_4}
-  curry i_Main_d__lc_pythag_4_rc_/3
-  def i_Main_d__lc_pythag_4_rc_( in1, in0, in2 ) do
+  # Prelude.List.replicate
+  curry i_Prelude_d_List_d_replicate/3
+  def i_Prelude_d_List_d_replicate( _e0, e1, e2 ) do
     aux1 =
-      if ( in2 * in2 + in1 * in1 == in0 * in0 ) do
-        true
-      else
-        false
+      case e1 do
+        0 ->
+          []
+        _ ->
+          in0 =
+            e1 - 1
+          [ e2 | i_Prelude_d_List_d_replicate( :idris_nothing, in0, e2 ) ]
       end
-    i_Prelude_d_Monad_d_Prelude_d_List_s_implementation_s_of_s_Prelude_d_Monad_d_Monad_c__s_method_s__gt__gt__eq_( :idris_nothing, :idris_nothing, i_Prelude_d_Applicative_d_guard( :idris_nothing, {:"constructor_s_of_s_Prelude.Applicative.Alternative", i_Main_d__lc_pythag_1_rc_(), i_Main_d__lc_pythag_2_rc_()}, aux1 ), i_Main_d__lc_pythag_3_rc_().( in2 ).( in1 ).( in0 ) )
+    aux1
   end
 
-  # Main.{pythag_3}
-  curry i_Main_d__lc_pythag_3_rc_/4
-  def i_Main_d__lc_pythag_3_rc_( in2, in1, in0, _in6 ) do
-    [ { in2 , { in1 , in0 } } | [] ]
+  # SafeActors.runBeh
+  curry i_SafeActors_d_runBeh/3
+  def i_SafeActors_d_runBeh( _e0, _e1, e2 ) do
+    aux1 =
+      case e2 do
+        {:Bind, in0, in1} ->
+          i_io_bind().( :idris_nothing ).( :idris_nothing ).( :idris_nothing ).( i_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, in0 ) ).( i_SafeActors_d__lc_runBeh_0_rc_().( in1 ) )
+        {:LiftIO, in3} ->
+          in3
+        {:Pure, in4} ->
+          i_io_pure().( :idris_nothing ).( :idris_nothing ).( in4 )
+        :Recv ->
+          i_ElixirFFI_d_unsafeReceive( :idris_nothing )
+        :Self ->
+          aux3 =
+            fn ( aux2 ) ->
+              i_ElixirFFI_d_selfPtr( aux2 )
+            end
+          i_io_bind().( :idris_nothing ).( :idris_nothing ).( :idris_nothing ).( aux3 ).( i_SafeActors_d__lc_runBeh_1_rc_() )
+        {:Send, in6, in7} ->
+          i_ElixirFFI_d_sendPtr().( in6 ).( in7 )
+        {:Spawn, in8} ->
+          i_io_bind().( :idris_nothing ).( :idris_nothing ).( :idris_nothing ).( i_ElixirFFI_d_spawnPtr().( i_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, in8 ) ) ).( i_SafeActors_d__lc_runBeh_2_rc_() )
+      end
+    aux1
   end
 
-  # Main.{pythag_2}
-  curry i_Main_d__lc_pythag_2_rc_/1
-  def i_Main_d__lc_pythag_2_rc_( _in5 ) do
-    []
+  # SafeActors.{runBeh_2}
+  curry i_SafeActors_d__lc_runBeh_2_rc_/1
+  def i_SafeActors_d__lc_runBeh_2_rc_( in9 ) do
+    i_io_pure().( :idris_nothing ).( :idris_nothing ).( in9 )
   end
 
-  # Main.{pythag_1}
-  curry i_Main_d__lc_pythag_1_rc_/1
-  def i_Main_d__lc_pythag_1_rc_( _in3 ) do
-    i_Main_d__lc_pythag_0_rc_()
+  # SafeActors.{runBeh_1}
+  curry i_SafeActors_d__lc_runBeh_1_rc_/1
+  def i_SafeActors_d__lc_runBeh_1_rc_( in5 ) do
+    i_io_pure().( :idris_nothing ).( :idris_nothing ).( in5 )
   end
 
-  # Main.{pythag_0}
-  curry i_Main_d__lc_pythag_0_rc_/1
-  def i_Main_d__lc_pythag_0_rc_( in4 ) do
-    [ in4 | [] ]
+  # SafeActors.{runBeh_0}
+  curry i_SafeActors_d__lc_runBeh_0_rc_/2
+  def i_SafeActors_d__lc_runBeh_0_rc_( in1, in2 ) do
+    i_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, in1.( in2 ) )
   end
 
   # run__IO
@@ -775,10 +743,24 @@ defmodule IdrisElixir do
     e1.( :idris_nothing )
   end
 
-  # Prelude.Show.show
-  curry i_Prelude_d_Show_d_show/2
-  def i_Prelude_d_Show_d_show( _e0, e1 ) do
-    e1
+  # ElixirFFI.selfPtr
+  curry i_ElixirFFI_d_selfPtr/1
+  def i_ElixirFFI_d_selfPtr( _i_w ) do
+    self(  )
+  end
+
+  # ElixirFFI.sendPtr
+  curry i_ElixirFFI_d_sendPtr/3
+  def i_ElixirFFI_d_sendPtr( e0, e1, _i_w ) do
+    send( e0, e1 )
+  end
+
+  # Prelude.Traversable.sequence
+  curry i_Prelude_d_Traversable_d_sequence/5
+  def i_Prelude_d_Traversable_d_sequence( _e0, _e1, _e2, e3, e4 ) do
+    aux1 =
+      i_Prelude_d_Traversable_d_traverse( :idris_nothing, e3, :idris_nothing, :idris_nothing, :idris_nothing, e4 )
+    aux1.( i_Prelude_d_Basics_d_id().( :idris_nothing ) )
   end
 
   # Prelude.Show.showParens
@@ -792,6 +774,24 @@ defmodule IdrisElixir do
           "(" <> e1 <> ")"
       end
     aux1
+  end
+
+  # ElixirFFI.sleep
+  curry i_ElixirFFI_d_sleep/2
+  def i_ElixirFFI_d_sleep( e0, _i_w ) do
+    :timer.sleep( e0 )
+  end
+
+  # SafeActors.spawn
+  curry i_SafeActors_d_spawn/3
+  def i_SafeActors_d_spawn( _e0, _e1, sat1 ) do
+    {:Spawn, sat1}
+  end
+
+  # ElixirFFI.spawnPtr
+  curry i_ElixirFFI_d_spawnPtr/2
+  def i_ElixirFFI_d_spawnPtr( e0, _i_w ) do
+    Idrislib.spawn_idris( e0 )
   end
 
   # Prelude.Strings.strM
@@ -824,21 +824,194 @@ defmodule IdrisElixir do
     aux5
   end
 
-  # Main.tips
-  curry i_Main_d_tips/1
-  def i_Main_d_tips( _e0 ) do
-    i_Main_d_foldTree().( :idris_nothing ).( :idris_nothing ).( i_Main_d__lc_tips_0_rc_() ).( i_Prelude_d_List_d__plus__plus_().( :idris_nothing ) )
+  # Main.tester
+  def i_Main_d_tester(  ) do
+    {:Bind, :Self, i_Main_d__lc_tester_24_rc_()}
   end
 
-  # Main.{tips_0}
-  curry i_Main_d__lc_tips_0_rc_/1
-  def i_Main_d__lc_tips_0_rc_( in0 ) do
-    [ in0 | [] ]
+  # Main.{tester_24}
+  curry i_Main_d__lc_tester_24_rc_/1
+  def i_Main_d__lc_tester_24_rc_( in0 ) do
+    aux1 =
+      i_Main_d_initState(  )
+    {:Bind, {:Spawn, i_Main_d_loop( aux1 )}, i_Main_d__lc_tester_23_rc_().( in0 )}
+  end
+
+  # Main.{tester_23}
+  curry i_Main_d__lc_tester_23_rc_/2
+  def i_Main_d__lc_tester_23_rc_( in0, in1 ) do
+    {:Bind, i_Prelude_d_Traversable_d_Prelude_d_List_s_implementation_s_of_s_Prelude_d_Traversable_d_Traversable_c__s_method_s_traverse( :idris_nothing, :idris_nothing, :idris_nothing, {:"constructor_s_of_s_Prelude.Applicative.Applicative", i_Main_d__lc_tester_1_rc_(), i_Main_d__lc_tester_5_rc_()}, i_SafeActors_d_spawn().( :idris_nothing ).( :idris_nothing ), i_Prelude_d_Monad_d_Prelude_d_List_s_implementation_s_of_s_Prelude_d_Monad_d_Monad_c__s_method_s__gt__gt__eq_( :idris_nothing, :idris_nothing, i_Prelude_d_Monad_d_Prelude_d_List_s_implementation_s_of_s_Prelude_d_Monad_d_Monad_c__s_method_s__gt__gt__eq_( :idris_nothing, :idris_nothing, [ "A" | [ "B" | [ "C" | [ "D" | [ "E" | [] ] ] ] ] ], i_Main_d__lc_tester_7_rc_() ), i_Main_d__lc_tester_8_rc_().( in1 ).( in0 ) ) ), i_Main_d__lc_tester_22_rc_()}
+  end
+
+  # Main.{tester_22}
+  curry i_Main_d__lc_tester_22_rc_/1
+  def i_Main_d__lc_tester_22_rc_( _in11 ) do
+    aux1 =
+      i_Prelude_d_Traversable_d_sequence( :idris_nothing, :idris_nothing, :idris_nothing, i_Main_d__lc_tester_14_rc_(), {:"constructor_s_of_s_Prelude.Applicative.Applicative", i_Main_d__lc_tester_16_rc_(), i_Main_d__lc_tester_20_rc_()} )
+    {:Bind, aux1.( i_Prelude_d_List_d_replicate( :idris_nothing, 50, :Recv ) ), i_Main_d__lc_tester_21_rc_()}
+  end
+
+  # Main.{tester_21}
+  curry i_Main_d__lc_tester_21_rc_/1
+  def i_Main_d__lc_tester_21_rc_( _in24 ) do
+    {:LiftIO, i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "Done!\n" )}
+  end
+
+  # Main.{tester_20}
+  curry i_Main_d__lc_tester_20_rc_/1
+  def i_Main_d__lc_tester_20_rc_( _in20 ) do
+    i_Main_d__lc_tester_19_rc_()
+  end
+
+  # Main.{tester_19}
+  curry i_Main_d__lc_tester_19_rc_/1
+  def i_Main_d__lc_tester_19_rc_( _in21 ) do
+    i_Main_d__lc_tester_18_rc_()
+  end
+
+  # Main.{tester_18}
+  curry i_Main_d__lc_tester_18_rc_/1
+  def i_Main_d__lc_tester_18_rc_( in22 ) do
+    i_Main_d__lc_tester_17_rc_().( in22 )
+  end
+
+  # Main.{tester_17}
+  curry i_Main_d__lc_tester_17_rc_/2
+  def i_Main_d__lc_tester_17_rc_( in22, in23 ) do
+    i_Prelude_d_Applicative_d_SafeActors_d_Beh_s_a_s_implementation_s_of_s_Prelude_d_Applicative_d_Applicative_c__s_method_s__lt__42__gt_( :idris_nothing, :idris_nothing, :idris_nothing, in22, in23 )
+  end
+
+  # Main.{tester_16}
+  curry i_Main_d__lc_tester_16_rc_/1
+  def i_Main_d__lc_tester_16_rc_( _in18 ) do
+    i_Main_d__lc_tester_15_rc_()
+  end
+
+  # Main.{tester_15}
+  curry i_Main_d__lc_tester_15_rc_/1
+  def i_Main_d__lc_tester_15_rc_( in19 ) do
+    {:Pure, in19}
+  end
+
+  # Main.{tester_14}
+  curry i_Main_d__lc_tester_14_rc_/1
+  def i_Main_d__lc_tester_14_rc_( _in12 ) do
+    i_Main_d__lc_tester_13_rc_()
+  end
+
+  # Main.{tester_13}
+  curry i_Main_d__lc_tester_13_rc_/1
+  def i_Main_d__lc_tester_13_rc_( _in13 ) do
+    i_Main_d__lc_tester_12_rc_()
+  end
+
+  # Main.{tester_12}
+  curry i_Main_d__lc_tester_12_rc_/1
+  def i_Main_d__lc_tester_12_rc_( _in14 ) do
+    i_Main_d__lc_tester_11_rc_()
+  end
+
+  # Main.{tester_11}
+  curry i_Main_d__lc_tester_11_rc_/1
+  def i_Main_d__lc_tester_11_rc_( in15 ) do
+    i_Main_d__lc_tester_10_rc_().( in15 )
+  end
+
+  # Main.{tester_10}
+  curry i_Main_d__lc_tester_10_rc_/2
+  def i_Main_d__lc_tester_10_rc_( in15, in16 ) do
+    i_Main_d__lc_tester_9_rc_().( in15 ).( in16 )
+  end
+
+  # Main.{tester_9}
+  curry i_Main_d__lc_tester_9_rc_/3
+  def i_Main_d__lc_tester_9_rc_( in15, in16, in17 ) do
+    i_Prelude_d_Traversable_d_Prelude_d_List_s_implementation_s_of_s_Prelude_d_Traversable_d_Traversable_c__s_method_s_traverse( :idris_nothing, :idris_nothing, :idris_nothing, in15, in16, in17 )
+  end
+
+  # Main.{tester_8}
+  curry i_Main_d__lc_tester_8_rc_/3
+  def i_Main_d__lc_tester_8_rc_( in1, in0, in10 ) do
+    [ i_Main_d_phone( in10, in1, in0 ) | [] ]
+  end
+
+  # Main.{tester_7}
+  curry i_Main_d__lc_tester_7_rc_/1
+  def i_Main_d__lc_tester_7_rc_( in8 ) do
+    i_Prelude_d_Monad_d_Prelude_d_List_s_implementation_s_of_s_Prelude_d_Monad_d_Monad_c__s_method_s__gt__gt__eq_( :idris_nothing, :idris_nothing, i_Prelude_d_Prelude_d_Integer_s_implementation_s_of_s_Prelude_d_Enum_c__s_method_s_enumFromTo( 1, 1 ), i_Main_d__lc_tester_6_rc_().( in8 ) )
+  end
+
+  # Main.{tester_6}
+  curry i_Main_d__lc_tester_6_rc_/2
+  def i_Main_d__lc_tester_6_rc_( in8, in9 ) do
+    aux2 =
+      fn ( aux1 ) ->
+        i_prim__toStrBigInt( aux1 )
+      end
+    [ in8 <> i_Prelude_d_Show_d_primNumShow( :idris_nothing, aux2, :Open, in9 ) | [] ]
+  end
+
+  # Main.{tester_5}
+  curry i_Main_d__lc_tester_5_rc_/1
+  def i_Main_d__lc_tester_5_rc_( _in4 ) do
+    i_Main_d__lc_tester_4_rc_()
+  end
+
+  # Main.{tester_4}
+  curry i_Main_d__lc_tester_4_rc_/1
+  def i_Main_d__lc_tester_4_rc_( _in5 ) do
+    i_Main_d__lc_tester_3_rc_()
+  end
+
+  # Main.{tester_3}
+  curry i_Main_d__lc_tester_3_rc_/1
+  def i_Main_d__lc_tester_3_rc_( in6 ) do
+    i_Main_d__lc_tester_2_rc_().( in6 )
+  end
+
+  # Main.{tester_2}
+  curry i_Main_d__lc_tester_2_rc_/2
+  def i_Main_d__lc_tester_2_rc_( in6, in7 ) do
+    i_Prelude_d_Applicative_d_SafeActors_d_Beh_s_a_s_implementation_s_of_s_Prelude_d_Applicative_d_Applicative_c__s_method_s__lt__42__gt_( :idris_nothing, :idris_nothing, :idris_nothing, in6, in7 )
+  end
+
+  # Main.{tester_1}
+  curry i_Main_d__lc_tester_1_rc_/1
+  def i_Main_d__lc_tester_1_rc_( _in2 ) do
+    i_Main_d__lc_tester_0_rc_()
+  end
+
+  # Main.{tester_0}
+  curry i_Main_d__lc_tester_0_rc_/1
+  def i_Main_d__lc_tester_0_rc_( in3 ) do
+    {:Pure, in3}
+  end
+
+  # Prelude.Traversable.traverse
+  curry i_Prelude_d_Traversable_d_traverse/6
+  def i_Prelude_d_Traversable_d_traverse( _e0, e1, e2, e3, e4, e5 ) do
+    e1.( e2 ).( e3 ).( e4 ).( e5 )
   end
 
   # unsafePerformPrimIO
   def i_unsafePerformPrimIO(  ) do
     :idris_nothing
+  end
+
+  # ElixirFFI.unsafeReceive
+  curry i_ElixirFFI_d_unsafeReceive/1
+  def i_ElixirFFI_d_unsafeReceive( _e0 ) do
+    aux2 =
+      fn ( aux1 ) ->
+        i_ElixirFFI_d_receivePtr( aux1 )
+      end
+    i_io_bind().( :idris_nothing ).( :idris_nothing ).( :idris_nothing ).( aux2 ).( i_ElixirFFI_d__lc_unsafeReceive_0_rc_() )
+  end
+
+  # ElixirFFI.{unsafeReceive_0}
+  curry i_ElixirFFI_d__lc_unsafeReceive_0_rc_/1
+  def i_ElixirFFI_d__lc_unsafeReceive_0_rc_( in0 ) do
+    i_io_pure().( :idris_nothing ).( :idris_nothing ).( in0 )
   end
 
   # world
@@ -853,7 +1026,7 @@ defmodule IdrisElixir do
     aux1 =
       case e0 do
         false ->
-          IdrisRts.force(e1)
+          Idrislib.LazyVal.force(e1)
         true ->
           true
       end
@@ -958,28 +1131,22 @@ defmodule IdrisElixir do
     aux1
   end
 
-  # Prelude.Show.Prelude.Show.List a implementation of Prelude.Show.Show, method show, show'
-  curry i_Prelude_d_Show_d_Prelude_d_Show_d_List_s_a_s_implementation_s_of_s_Prelude_d_Show_d_Show_c__s_method_s_show_c__s_show_prime_/5
-  def i_Prelude_d_Show_d_Prelude_d_Show_d_List_s_a_s_implementation_s_of_s_Prelude_d_Show_d_Show_c__s_method_s_show_c__s_show_prime_( _e0, _e1, e2, e3, e4 ) do
-    aux1 =
-      case e4 do
-        [ in0 | in1 ] ->
-          aux2 =
-            case in1 do
-              [] ->
-                aux3 =
-                  i_Prelude_d_Show_d_show( :idris_nothing, e2 )
-                e3 <> aux3.( in0 )
-              _ ->
-                aux4 =
-                  i_Prelude_d_Show_d_show( :idris_nothing, e2 )
-                i_Prelude_d_Show_d_Prelude_d_Show_d_List_s_a_s_implementation_s_of_s_Prelude_d_Show_d_Show_c__s_method_s_show_c__s_show_prime_( :idris_nothing, :idris_nothing, e2, e3 <> aux4.( in0 ) <> ", ", in1 )
-            end
-          aux2
-        [] ->
-          e3
-      end
-    aux1
+  # Prelude.Applicative.SafeActors.Beh a implementation of Prelude.Applicative.Applicative, method <*>
+  curry i_Prelude_d_Applicative_d_SafeActors_d_Beh_s_a_s_implementation_s_of_s_Prelude_d_Applicative_d_Applicative_c__s_method_s__lt__42__gt_/5
+  def i_Prelude_d_Applicative_d_SafeActors_d_Beh_s_a_s_implementation_s_of_s_Prelude_d_Applicative_d_Applicative_c__s_method_s__lt__42__gt_( _e0, _e1, _e2, e3, e4 ) do
+    {:Bind, e3, i_Prelude_d_Applicative_d__lc_SafeActors_d__at_Prelude_d_Applicative_d_Applicative_36_Beh_s_a_colon__bang__lt__42__gt__colon_0_lam_1_rc_().( e4 )}
+  end
+
+  # Prelude.Applicative.{SafeActors.@Prelude.Applicative.Applicative$Beh a:!<*>:0_lam_1}
+  curry i_Prelude_d_Applicative_d__lc_SafeActors_d__at_Prelude_d_Applicative_d_Applicative_36_Beh_s_a_colon__bang__lt__42__gt__colon_0_lam_1_rc_/2
+  def i_Prelude_d_Applicative_d__lc_SafeActors_d__at_Prelude_d_Applicative_d_Applicative_36_Beh_s_a_colon__bang__lt__42__gt__colon_0_lam_1_rc_( e4, in0 ) do
+    {:Bind, e4, i_Prelude_d_Applicative_d__lc_SafeActors_d__at_Prelude_d_Applicative_d_Applicative_36_Beh_s_a_colon__bang__lt__42__gt__colon_0_lam_0_rc_().( in0 )}
+  end
+
+  # Prelude.Applicative.{SafeActors.@Prelude.Applicative.Applicative$Beh a:!<*>:0_lam_0}
+  curry i_Prelude_d_Applicative_d__lc_SafeActors_d__at_Prelude_d_Applicative_d_Applicative_36_Beh_s_a_colon__bang__lt__42__gt__colon_0_lam_0_rc_/2
+  def i_Prelude_d_Applicative_d__lc_SafeActors_d__at_Prelude_d_Applicative_d_Applicative_36_Beh_s_a_colon__bang__lt__42__gt__colon_0_lam_0_rc_( in0, in1 ) do
+    {:Pure, in0.( in1 )}
   end
 
   # Decidable.Equality.Decidable.Equality.Bool implementation of Decidable.Equality.DecEq, method decEq
@@ -1350,20 +1517,37 @@ defmodule IdrisElixir do
     aux1
   end
 
-  # Prelude.Show.Prelude.Show.List a implementation of Prelude.Show.Show, method show
-  curry i_Prelude_d_Show_d_Prelude_d_Show_d_List_s_a_s_implementation_s_of_s_Prelude_d_Show_d_Show_c__s_method_s_show/3
-  def i_Prelude_d_Show_d_Prelude_d_Show_d_List_s_a_s_implementation_s_of_s_Prelude_d_Show_d_Show_c__s_method_s_show( _e0, e1, e2 ) do
-    "[" <> i_Prelude_d_Show_d_Prelude_d_Show_d_List_s_a_s_implementation_s_of_s_Prelude_d_Show_d_Show_c__s_method_s_show_c__s_show_prime_( :idris_nothing, :idris_nothing, e1, "", e2 ) <> "]"
+  # Prelude.Traversable.Prelude.List implementation of Prelude.Traversable.Traversable, method traverse
+  curry i_Prelude_d_Traversable_d_Prelude_d_List_s_implementation_s_of_s_Prelude_d_Traversable_d_Traversable_c__s_method_s_traverse/6
+  def i_Prelude_d_Traversable_d_Prelude_d_List_s_implementation_s_of_s_Prelude_d_Traversable_d_Traversable_c__s_method_s_traverse( _e0, _e1, _e2, e3, e4, e5 ) do
+    aux1 =
+      case e5 do
+        [ in0 | in1 ] ->
+          aux2 =
+            i_Prelude_d_Applicative_d_pure( :idris_nothing, e3, :idris_nothing )
+          aux3 =
+            i_Prelude_d_Applicative_d__lt__42__gt_( :idris_nothing, e3, :idris_nothing, :idris_nothing )
+          aux4 =
+            i_Prelude_d_Applicative_d__lt__42__gt_( :idris_nothing, e3, :idris_nothing, :idris_nothing )
+          aux4.( aux3.( aux2.( i_Prelude_d_Traversable_d__lc_Prelude_d__at_Prelude_d_Traversable_d_Traversable_36_List_colon__bang_traverse_colon_0_lam_1_rc_() ) ).( e4.( in0 ) ) ).( i_Prelude_d_Traversable_d_Prelude_d_List_s_implementation_s_of_s_Prelude_d_Traversable_d_Traversable_c__s_method_s_traverse( :idris_nothing, :idris_nothing, :idris_nothing, e3, e4, in1 ) )
+        [] ->
+          aux5 =
+            i_Prelude_d_Applicative_d_pure( :idris_nothing, e3, :idris_nothing )
+          aux5.( [] )
+      end
+    aux1
   end
 
-  # Prelude.Show.Prelude.Show.Nat implementation of Prelude.Show.Show, method show
-  curry i_Prelude_d_Show_d_Prelude_d_Show_d_Nat_s_implementation_s_of_s_Prelude_d_Show_d_Show_c__s_method_s_show/1
-  def i_Prelude_d_Show_d_Prelude_d_Show_d_Nat_s_implementation_s_of_s_Prelude_d_Show_d_Show_c__s_method_s_show( e0 ) do
-    aux2 =
-      fn ( aux1 ) ->
-        i_prim__toStrBigInt( aux1 )
-      end
-    i_Prelude_d_Show_d_primNumShow( :idris_nothing, aux2, :Open, e0 )
+  # Prelude.Traversable.{Prelude.@Prelude.Traversable.Traversable$List:!traverse:0_lam_1}
+  curry i_Prelude_d_Traversable_d__lc_Prelude_d__at_Prelude_d_Traversable_d_Traversable_36_List_colon__bang_traverse_colon_0_lam_1_rc_/1
+  def i_Prelude_d_Traversable_d__lc_Prelude_d__at_Prelude_d_Traversable_d_Traversable_36_List_colon__bang_traverse_colon_0_lam_1_rc_( in2 ) do
+    i_Prelude_d_Traversable_d__lc_Prelude_d__at_Prelude_d_Traversable_d_Traversable_36_List_colon__bang_traverse_colon_0_lam_0_rc_().( in2 )
+  end
+
+  # Prelude.Traversable.{Prelude.@Prelude.Traversable.Traversable$List:!traverse:0_lam_0}
+  curry i_Prelude_d_Traversable_d__lc_Prelude_d__at_Prelude_d_Traversable_d_Traversable_36_List_colon__bang_traverse_colon_0_lam_0_rc_/2
+  def i_Prelude_d_Traversable_d__lc_Prelude_d__at_Prelude_d_Traversable_d_Traversable_36_List_colon__bang_traverse_colon_0_lam_0_rc_( in2, in3 ) do
+    [ in2 | in3 ]
   end
 
   # with block in Prelude.Interfaces.Prelude.Show.Prec implementation of Prelude.Interfaces.Ord, method >
@@ -1431,15 +1615,114 @@ defmodule IdrisElixir do
     aux1
   end
 
-  # constructor of Prelude.Applicative.Alternative#Applicative f
-  curry i_constructor_s_of_s_Prelude_d_Applicative_d_Alternative_hash_Applicative_s_f/2
-  def i_constructor_s_of_s_Prelude_d_Applicative_d_Alternative_hash_Applicative_s_f( _e0, e1 ) do
+  # Main.case block in loop at Frequency.idr:27:8
+  curry i_Main_d_case_s_block_s_in_s_loop_s_at_s_Frequency_d_idr_colon_27_colon_8/3
+  def i_Main_d_case_s_block_s_in_s_loop_s_at_s_Frequency_d_idr_colon_27_colon_8( e0, e1, _e2 ) do
     aux1 =
       case e1 do
-        {:"constructor_s_of_s_Prelude.Applicative.Alternative", in0, _in1} ->
-          in0
+        {:GetFreq, in0} ->
+          aux2 =
+            case e0 do
+              [ in1 | in2 ] ->
+                {:Bind, {:Send, in0, {:Freq, in1}}, i_Main_d__lc_loop_Frequency__idr_27_8_case_lam_0_rc_().( in2 )}
+              [] ->
+                {:Bind, {:Send, in0, :NoneFree}, i_Main_d__lc_loop_Frequency__idr_27_8_case_lam_1_rc_()}
+            end
+          aux2
+        {:RetFreq, in5} ->
+          i_Main_d_loop( [ in5 | e0 ] )
       end
     aux1
+  end
+
+  # Main.{loop_Frequency__idr_27_8_case_lam_1}
+  curry i_Main_d__lc_loop_Frequency__idr_27_8_case_lam_1_rc_/1
+  def i_Main_d__lc_loop_Frequency__idr_27_8_case_lam_1_rc_( _in4 ) do
+    i_Main_d_loop( [] )
+  end
+
+  # Main.{loop_Frequency__idr_27_8_case_lam_0}
+  curry i_Main_d__lc_loop_Frequency__idr_27_8_case_lam_0_rc_/2
+  def i_Main_d__lc_loop_Frequency__idr_27_8_case_lam_0_rc_( in2, _in3 ) do
+    i_Main_d_loop( in2 )
+  end
+
+  # Main.case block in case block in loop at Frequency.idr:27:8 at Frequency.idr:29:12
+  curry i_Main_d_case_s_block_s_in_s_case_s_block_s_in_s_loop_s_at_s_Frequency_d_idr_colon_27_colon_8_s_at_s_Frequency_d_idr_colon_29_colon_12/4
+  def i_Main_d_case_s_block_s_in_s_case_s_block_s_in_s_loop_s_at_s_Frequency_d_idr_colon_27_colon_8_s_at_s_Frequency_d_idr_colon_29_colon_12( e0, e1, _e2, _e3 ) do
+    aux1 =
+      case e0 do
+        [ in0 | in1 ] ->
+          {:Bind, {:Send, e1, {:Freq, in0}}, i_Main_d__lc_loop_Frequency__idr_27_8_case_Frequency__idr_29_12_case_lam_0_rc_().( in1 )}
+        [] ->
+          {:Bind, {:Send, e1, :NoneFree}, i_Main_d__lc_loop_Frequency__idr_27_8_case_Frequency__idr_29_12_case_lam_1_rc_()}
+      end
+    aux1
+  end
+
+  # Main.{loop_Frequency__idr_27_8_case_Frequency__idr_29_12_case_lam_1}
+  curry i_Main_d__lc_loop_Frequency__idr_27_8_case_Frequency__idr_29_12_case_lam_1_rc_/1
+  def i_Main_d__lc_loop_Frequency__idr_27_8_case_Frequency__idr_29_12_case_lam_1_rc_( _in3 ) do
+    i_Main_d_loop( [] )
+  end
+
+  # Main.{loop_Frequency__idr_27_8_case_Frequency__idr_29_12_case_lam_0}
+  curry i_Main_d__lc_loop_Frequency__idr_27_8_case_Frequency__idr_29_12_case_lam_0_rc_/2
+  def i_Main_d__lc_loop_Frequency__idr_27_8_case_Frequency__idr_29_12_case_lam_0_rc_( in1, _in2 ) do
+    i_Main_d_loop( in1 )
+  end
+
+  # Main.case block in phone at Frequency.idr:43:8
+  curry i_Main_d_case_s_block_s_in_s_phone_s_at_s_Frequency_d_idr_colon_43_colon_8/7
+  def i_Main_d_case_s_block_s_in_s_phone_s_at_s_Frequency_d_idr_colon_43_colon_8( e0, e1, e2, _e3, _e4, e5, _e6 ) do
+    aux1 =
+      case e5 do
+        {:Freq, in0} ->
+          aux3 =
+            fn ( aux2 ) ->
+              i_prim__toStrInt( aux2 )
+            end
+          {:Bind, {:LiftIO, i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "phone " <> e0 <> " got a frequency: " <> i_Prelude_d_Show_d_primNumShow( :idris_nothing, aux3, :Open, in0 ) <> "\n" )}, i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_3_rc_().( e1 ).( in0 ).( e0 ).( e2 )}
+        _ ->
+          {:Bind, {:LiftIO, i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "phone " <> e0 <> " couldn't get frequency!" <> "\n" )}, i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_5_rc_().( e0 ).( e1 ).( e2 )}
+      end
+    aux1
+  end
+
+  # Main.{phone_Frequency__idr_43_8_case_lam_5}
+  curry i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_5_rc_/4
+  def i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_5_rc_( e0, e1, e2, _in5 ) do
+    {:Bind, {:LiftIO, i_ElixirFFI_d_sleep().( 1000 )}, i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_4_rc_().( e0 ).( e1 ).( e2 )}
+  end
+
+  # Main.{phone_Frequency__idr_43_8_case_lam_4}
+  curry i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_4_rc_/4
+  def i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_4_rc_( e0, e1, e2, _in6 ) do
+    i_Main_d_phone( e0, e1, e2 )
+  end
+
+  # Main.{phone_Frequency__idr_43_8_case_lam_3}
+  curry i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_3_rc_/5
+  def i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_3_rc_( e1, in0, e0, e2, _in1 ) do
+    {:Bind, {:LiftIO, i_ElixirFFI_d_sleep().( 1500 )}, i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_2_rc_().( e1 ).( in0 ).( e0 ).( e2 )}
+  end
+
+  # Main.{phone_Frequency__idr_43_8_case_lam_2}
+  curry i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_2_rc_/5
+  def i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_2_rc_( e1, in0, e0, e2, _in2 ) do
+    {:Bind, {:Send, e1, {:RetFreq, in0}}, i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_1_rc_().( e0 ).( e2 )}
+  end
+
+  # Main.{phone_Frequency__idr_43_8_case_lam_1}
+  curry i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_1_rc_/3
+  def i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_1_rc_( e0, e2, _in3 ) do
+    {:Bind, {:LiftIO, i_Prelude_d_Interactive_d_putStr_prime_( :idris_nothing, "phone " <> e0 <> " has finished calling." <> "\n" )}, i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_0_rc_().( e2 )}
+  end
+
+  # Main.{phone_Frequency__idr_43_8_case_lam_0}
+  curry i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_0_rc_/2
+  def i_Main_d__lc_phone_Frequency__idr_43_8_case_lam_0_rc_( e2, _in4 ) do
+    {:Send, e2, {}}
   end
 
   # case block in io_bind at IO.idr:107:34
@@ -1462,7 +1745,7 @@ defmodule IdrisElixir do
   def runMain0(  ) do
     aux1 =
       i_Main_d_main(  )
-    IdrisRts.force(aux1.( :idris_nothing ))
+    Idrislib.LazyVal.force(aux1.( :idris_nothing ))
   end
 end
 

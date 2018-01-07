@@ -62,7 +62,7 @@ tester = do
             [ phone name serv me
             | name <- [ n ++ show i
                       | n <- ["A","B","C","D","E"]
-                      , i <- [1..10]
+                      , i <- [1..1]
                       ]
             ]
   -- Wait for all the phones to say they managed to make a p

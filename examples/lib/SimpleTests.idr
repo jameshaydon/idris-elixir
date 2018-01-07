@@ -32,9 +32,13 @@ tips = foldTree pure (++)
 sumTips : Num a => Tree a -> a
 sumTips = foldTree id (+)
 
+ones : Stream Nat
+ones = 1 :: ones
+
 main : EIO ()
 main = do
   putStrLn' $ "Should be 55: " ++ show (fifi [1..10])
   putStrLn' $ "Should be 21: " ++ show (sumTips (exampleTree))
   putStrLn' $ "Should be " ++ show [1..6] ++ ": " ++ show (tips (exampleTree))
   putStrLn' $ "Should be 20: " ++ show (length (pythag 50))
+  putStrLn' $ show (take 5 ones)
