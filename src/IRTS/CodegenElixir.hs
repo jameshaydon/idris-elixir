@@ -74,13 +74,14 @@ codegenElixir ci = do
   let initState = CGState 1 (makeDefsState definitions)
   let (ds, st) = runState (traverse elixirDef definitions) initState
   let elixirDefs = vcat ds
-  let partials = makePartials st
+  -- let partials = makePartials st
   let f =     topComment
           $+$ helperModule
           $+$ text ""
           $+$ text "defmodule IdrisElixir do"
+          $+$ indent (text "import Idrislib")
           $+$ indent elixirDefs
-          $+$ indent partials
+          -- $+$ indent partials
           $+$ text "end"
           $+$ text ""
           $+$ start
@@ -167,10 +168,13 @@ defLambda (a:args) body =
 
 defFunction :: Doc -> [Doc] -> Doc -> Doc
 defFunction name args body =
-     text "def " <> name <> text "(" <+> commaSeperated args <+> text ") do"
+      (if n /= 0 then text "curry" <+> name <> text "/" <> text (show (length args)) else empty)
+  $+$ text "def " <> name <> text "(" <+> commaSeperated args <+> text ") do"
   -- $+$ indent (text "IO.puts \"in:" <+> name <> text "\"")
   $+$ indent body
   $+$ text "end"
+  where
+    n = length args
 
 cgCon :: Name -> [Doc] -> Doc
 -- Unit
@@ -208,18 +212,19 @@ elixirDef (name, decl) = do
   resetVarCounter
   case decl of
     con@LConstructor{} -> pure $
-          text "#" <+> text (showName name)
-      $+$ multiLineComment (show con)
-      $+$ text ""
+      --     text "#" <+> text (showName name)
+      -- $+$ multiLineComment (show con)
+      -- $+$ text ""
+      empty
     LFun _ _ arguments body -> do
       let argNames = usedArgumentList arguments body
       (stmts, retV) <- cgBody body
       pure $
+        --    text ""
+        -- $+$ multiLineComment (show decl)
             text ""
-        $+$ multiLineComment (show decl)
-        $+$ text ""
         $+$ text "#" <+> text (show name)
-        $+$ text "#" <+> text (showName name)
+        -- $+$ text "#" <+> text (showName name)
         $+$ defFunction
               (cgName name)
               argNames
@@ -260,7 +265,7 @@ defFunApp :: Doc -> [Doc] -> Doc
 defFunApp f xs = f <> text "(" <+> commaSeperated xs <+> text ")"
 
 fnApp :: Doc -> [Doc] -> Doc
-fnApp f []     = f <> text ".()"
+fnApp f []     = f -- <> text ".()"
 fnApp f [x]    = f <> text ".(" <+> x <+> text ")"
 fnApp f (x:xs) = fnApp (fnApp f [x]) xs
 
@@ -284,15 +289,18 @@ cgBody body = case body of
             $+$ text "end"
     pure (scrutStmts $+$ cgAssign (cgVar ifElseV) b, cgVar ifElseV)
   LCase _ e alts -> do
-    scrutV <- fresh
-    (scrutStmts, scrut) <- cgBody e
+    (preStmts, scrut) <- case e of
+      x@(LV v) -> cgBody x
+      e -> do
+        scrutV <- fresh
+        (scrutStmts, scrut) <- cgBody e
+        pure (scrutStmts $+$ cgAssign (cgVar scrutV) scrut, cgVar scrutV)
     caseVar <- fresh
     as <- traverse cgAlt alts
-    let cbody =     text "case " <> cgVar scrutV <> text " do"
+    let cbody =     text "case " <> scrut <> text " do"
                 $+$ indent (vcat as)
                 $+$ text "end"
-    let stmts =     scrutStmts
-                $+$ cgAssign (cgVar scrutV) scrut
+    let stmts =     preStmts
                 $+$ cgAssign (cgVar caseVar) cbody
     pure (stmts, cgVar caseVar)
   -- -- special receive function
@@ -321,8 +329,11 @@ cgBody body = case body of
             (stmts, defFunApp (cgName f) argEs)
           -- Partial application:
           GT -> do
-            recordPartialUse f numArgs
-            pure (stmts, defFunApp (cgName f <> text "_partial" <> text (show numArgs)) argEs)
+            -- When partials were constructed manually:
+            -- recordPartialUse f numArgs
+            -- pure (stmts, defFunApp (cgName f <> text "_partial" <> text (show numArgs)) argEs)
+            -- Using the elixir `curry` macro:
+            pure (stmts, fnApp (cgName f <> text "()") argEs)
           -- Over application:
           LT -> do
             func <- fresh
@@ -350,7 +361,7 @@ cgBody body = case body of
   LProj _ _ -> pure (empty, text "UNIM PROJ")
   c@(LCon _ _ n es) -> do
     xs <- traverse cgBody es
-    let ss = (vcat $ fst <$> xs) $+$ (multiLineComment (show c ++ "\n" ++ show (length es)))
+    let ss = (vcat $ fst <$> xs) -- $+$ (multiLineComment (show c ++ "\n" ++ show (length es)))
     pure (ss, cgCon n (snd <$> xs))
   LConst c -> pure (empty, cgConst c)
   LForeign _ (FStr fn) args -> do
@@ -476,4 +487,4 @@ constructorName (NS (UN un) _) | isLegalAtom (T.unpack un) = text (':' : T.unpac
       && isAlpha c
     isLegalAtom _ = False
 constructorName (NS (UN un) _) = text ":\"" <> text (concatMap (elixirChar ".") (T.unpack un)) <> text "\""
-constructorName n = text (concatMap (elixirChar ".") (show n))
+constructorName n = text ":\"" <> text (concatMap (elixirChar ".") (show n)) <> text "\""
