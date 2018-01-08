@@ -1,8 +1,13 @@
 # Idris Elixir
 
-An Elixir code-generator for Idris based on the `LDecl` intermediate representation. Use dependent types and other awsome Idris features with easy FFI to Elixir. The idea is to use the ideas from e.g. [this paper](https://eb.host.cs.st-andrews.ac.uk/writings/tdd-conc.pdf) to create safe distributed processes, while having access to GenStage, OTP, etc.
+An Elixir code-generator for Idris based on the `LDecl` intermediate
+representation. Use dependent types and other awsome Idris features with easy
+FFI to Elixir. The idea is to use the ideas from e.g. [this
+paper](https://eb.host.cs.st-andrews.ac.uk/writings/tdd-conc.pdf) to create safe
+distributed processes, while having access to GenStage, OTP, etc.
 
-By using `LDecl` the generated Elixir code is already quite readable, for example the Idris code:
+By using `LDecl` the generated Elixir code is already quite readable, for
+example the Idris code:
 
 ```idris
 data Tree a = Leaf a | Node (Tree a) (Tree a)
@@ -31,11 +36,16 @@ end
 
 And this can still be improved.
 
-Work in progress, much inspired by the [Javascript](https://github.com/idris-lang/Idris-dev/tree/master/src/IRTS/JavaScript) and [Python](https://github.com/ziman/idris-py) code-generators.
+Work in progress, much inspired by the
+[Javascript](https://github.com/idris-lang/Idris-dev/tree/master/src/IRTS/JavaScript)
+and [Python](https://github.com/ziman/idris-py) code-generators.
 
 ## Examples
 
-There is a behaviour type `Beh : Type -> Type -> Type` which is used for coding safe actors. These are actors which won't send messages to actors which don't know how to handle them. `Beh a b` is code for a safe-actor which expects messages of type `a` which results in a `b`. The essential functions are:
+There is a behaviour type `Beh : Type -> Type -> Type` which is used for coding
+safe actors. These are actors which won't send messages to actors which don't
+know how to handle them. `Beh a b` is code for a safe-actor which expects
+messages of type `a` which results in a `b`. The essential functions are:
 
 ```idris
 ||| PID of current process
@@ -53,7 +63,9 @@ spawn : Beh b () -> Beh a (PID b)
 
 ### Frequency allocation server
 
-Here is an example of a frequency allocation server for a telephone network (an example from the [Designing for Scalability with Erlang/OTP](http://shop.oreilly.com/product/0636920024149.do) book):
+Here is an example of a frequency allocation server for a telephone network (an
+example from the [Designing for Scalability with
+Erlang/OTP](http://shop.oreilly.com/product/0636920024149.do) book):
 
 ```idris
 State : Type
@@ -128,12 +140,13 @@ foo coord ki = do
   send coord ()
 ```
 
-__TODO:__ It would also be nice to create processes which implement _protocols_ specified
-in their type.
+__TODO:__ It would also be nice to create processes which implement _protocols_
+specified in their type.
 
 ### OTP
 
-I am in the process of making FFI functions for spaning OTP servers. For the moment there is only:
+I am in the process of making FFI functions for spaning OTP servers. For the
+moment there is only:
 
 ```idris
 gengenserver : (init : () -> InitRet state reason) ->
@@ -141,7 +154,8 @@ gengenserver : (init : () -> InitRet state reason) ->
                EIO (Ptr, Ptr)
 ```
 
-which will spawn an OTP GenServer with init function `init` and `hcall` for the `handle_call` callback.
+which will spawn an OTP GenServer with init function `init` and `hcall` for the
+`handle_call` callback.
 
 ## FFI
 
@@ -198,18 +212,21 @@ to avoid the idris compiler erasing the fields:
 
 ## Build
 
+Build the haskell project
+
 ```
 stack build
 ```
 
-## Run
+The `examples` directory is an Elixir `mix` project with some example Idris
+files. They are compiled like so:
 
 ```
 cd examples/lib
 stack exec idris -- Frequency.idr --codegen elixir -o Frequency.ex
 ```
 
-To run the code, in `/examples` run
+To run the elixir project (in `/examples`):
 ```
 iex -S mix
 ```
@@ -218,4 +235,5 @@ iex -S mix
 
 - Make protocol actors
 - Implement FFI functions for the main OTP behaviours
-- The [Elchemy](https://github.com/wende/elchemy) project uses `curry` to make functions curried. `idris-elixir` should do this too.
+- Lazy values are made with Elixir `Agent`s, but they don't terminate so this is
+  surely a memory leak.
