@@ -1,6 +1,35 @@
 # Idris Elixir
 
-An Elixir code-generator for Idris based on the `LDecl` intermediate representation. Use dependent types and other awsome Idris features with easy FFI to Elixir.
+An Elixir code-generator for Idris based on the `LDecl` intermediate representation. Use dependent types and other awsome Idris features with easy FFI to Elixir. The idea is to use the ideas from e.g. [this paper](https://eb.host.cs.st-andrews.ac.uk/writings/tdd-conc.pdf) to create safe distributed processes, while having access to GenStage, OTP, etc.
+
+By using `LDecl` the generated Elixir code is already quite readable, for example the Idris code:
+
+```idris
+data Tree a = Leaf a | Node (Tree a) (Tree a)
+
+sumTree : Tree Int -> Int
+sumTree (Leaf x) = x
+sumTree (Node l r) = sumTree l + sumTree r
+```
+
+compiles to:
+
+```elixir
+# Main.sumTree
+curry i_Main_d_sumTree/1
+def i_Main_d_sumTree( arg0 ) do
+  aux1 =
+    case arg0 do
+      {:Leaf, in1} ->
+        in1
+      {:Node, in2, in3} ->
+        i_Main_d_sumTree( in2 ) + i_Main_d_sumTree( in3 )
+    end
+  aux1
+end
+```
+
+And this can still be improved.
 
 Work in progress, much inspired by the [Javascript](https://github.com/idris-lang/Idris-dev/tree/master/src/IRTS/JavaScript) and [Python](https://github.com/ziman/idris-py) code-generators.
 
@@ -176,8 +205,13 @@ stack build
 ## Run
 
 ```
-cd examples
-stack exec idris -- ex.idr --codegen elixir -o ex.exs
+cd examples/lib
+stack exec idris -- Frequency.idr --codegen elixir -o Frequency.ex
+```
+
+To run the code, in `/examples` run
+```
+iex -S mix
 ```
 
 ## TODO
