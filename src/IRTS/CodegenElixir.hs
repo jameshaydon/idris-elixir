@@ -82,12 +82,12 @@ codegenElixir ci = do
           $+$ indent elixirDefs
           -- $+$ indent partials
           $+$ text "end"
-          $+$ text ""
-          $+$ start
+          -- $+$ text ""
+          -- $+$ start
   writeFile (outputFile ci) (render "#" (removeEmptyLineWS f))
   where
     topComment = text "# This file was compiled by idris-elixir."
-    start = text "IdrisElixir.runMain0()"
+    -- start = text "IdrisElixir.runMain0()"
 
 -- makePartials :: CGState -> Doc
 -- makePartials st =
@@ -192,9 +192,9 @@ elixirDef (name, decl) = do
       let argNames = usedArgumentList arguments body
       (stmts, retV) <- cgBody body
       pure $
-        --    text ""
-        -- $+$ multiLineComment (show decl)
             text ""
+        -- $+$ multiLineComment (show decl)
+        -- $+$ text ""
         $+$ text "#" <+> text (show name)
         -- $+$ text "#" <+> text (showName name)
         $+$ defFunction
@@ -202,6 +202,9 @@ elixirDef (name, decl) = do
               argNames
               (stmts $+$ retV)
 
+-- | Given an expression, crudely computes the free variables so that we can
+-- mark them as unused, so that the elixir compiler doesn't complain about
+-- unused variables.
 usedArgs :: LExp -> S.Set Name
 usedArgs e = case e of
   LV n            -> S.singleton n
@@ -214,17 +217,22 @@ usedArgs e = case e of
   LCase _ x as    -> usedArgs x <> foldMap frAlt as
   LConst _        -> S.empty
   LForeign _ _ xs -> foldMap usedArgs (snd <$> xs)
-  LOp _ xs   -> foldMap usedArgs xs
+  LOp prim xs     -> primOpUsed prim xs
   LNothing        -> S.empty
   LError _        -> S.empty
   -- The following are lifted so shouldn't ever be hit.
-  LLam _ _ -> errLifted
-  LLazyExp _ -> errLifted
+  LLam _ _        -> errLifted
+  LLazyExp _      -> errLifted
   where
     frAlt (LConCase _ _ _ x) = usedArgs x
     frAlt (LConstCase _ x)   = usedArgs x
     frAlt (LDefaultCase x)   = usedArgs x
+
     errLifted = error "Encountered LExp form which should have been lifted prior to this compilation step."
+
+    -- Some prim functions don't do anything with some of their arguments.
+    primOpUsed LWriteStr [_,x] = usedArgs x
+    primOpUsed _ xs = foldMap usedArgs xs
 
 cgAssign :: Doc -> Expr -> Stmts
 cgAssign v e =
@@ -251,7 +259,7 @@ cgBody body = case body of
     ds_ <- getDefState v
     case ds_ of
       Nothing -> pure (empty, cgName v)
-      Just _ -> pure (empty, cgName v <> text "()")
+      Just _  -> pure (empty, cgName v <> text "()")
   LCase _ e@(LOp _ [_, _]) [LConstCase (I 0) whenFalse, LDefaultCase whenTrue] -> do
     ifElseV <- fresh
     (scrutStmts, scrut) <- cgBody e

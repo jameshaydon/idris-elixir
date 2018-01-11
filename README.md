@@ -212,23 +212,32 @@ to avoid the idris compiler erasing the fields:
 
 ## Build
 
-Build the haskell project
+Build the haskell project (you need to have stack installed):
 
 ```
-stack build
+$ stack build
 ```
 
-The `examples` directory is an Elixir `mix` project with some example Idris
-files. They are compiled like so:
+Build the `elixir` Idris library, which provides Elixir FFI and OTP bindings:
 
 ```
-cd examples/lib
-stack exec idris -- Frequency.idr --codegen elixir -o Frequency.ex
+$ cd lib
+$ stack exec idris -- --build elixir.ipkg 
+$ stack exec idris -- --install elixir.ipkg
 ```
 
-To run the elixir project (in `/examples`):
+The `examples` directory is an Elixir `mix` project with some example idris
+projects. For example to run the frequency allocation example:
+
 ```
-iex -S mix
+$ cd examples
+$ stack exec idris -- lib/freqalloc/src/Main.idr -p elixir --codegen elixir -o lib/freq_alloc.ex
+```
+
+To run the elixir project:
+```
+$ iex -S mix
+iex(1)> Main.main()
 ```
 
 ## TODO

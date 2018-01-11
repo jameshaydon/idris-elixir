@@ -1,0 +1,9 @@
+package freqalloc
+
+-- freqalloc
+-- by James Haydon
+
+opts = ""
+sourcedir = src
+modules = Freqalloc
+pkgs = elixir

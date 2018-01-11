@@ -8,7 +8,7 @@ defmodule IdrisElixir do
     aux1 =
       i_Main_d_tester(  )
     aux2 =
-      i_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, aux1 )
+      i_Elixir_d_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, aux1 )
     Idrislib.LazyVal.force(aux2.( :idris_nothing ))
   end
 
@@ -22,76 +22,70 @@ defmodule IdrisElixir do
     :idris_nothing
   end
 
-  # case block in io_bind at IO.idr:108:34-36
-  curry i_case_s_block_s_in_s_io_bind_s_at_s_IO_d_idr_colon_108_colon_34_45_36/8
-  def i_case_s_block_s_in_s_io_bind_s_at_s_IO_d_idr_colon_108_colon_34_45_36( _arg0, _arg1, _arg2, _arg3, _arg4, arg5, _arg6, arg7 ) do
-    arg7.( arg5 )
+  # Main.case block in tester at Main.idr:68:8-35
+  curry i_Main_d_case_s_block_s_in_s_tester_s_at_s_Main_d_idr_colon_68_colon_8_45_35/5
+  def i_Main_d_case_s_block_s_in_s_tester_s_at_s_Main_d_idr_colon_68_colon_8_45_35( _arg0, _arg1, _arg2, _arg3, _arg4 ) do
+    {:LiftIO, i_Main_d__lc_tester_Main__idr_68_8_68_35_case_lam_52_rc_()}
   end
 
-  # Main.case block in tester at Frequency.idr:69:8-35
-  curry i_Main_d_case_s_block_s_in_s_tester_s_at_s_Frequency_d_idr_colon_69_colon_8_45_35/5
-  def i_Main_d_case_s_block_s_in_s_tester_s_at_s_Frequency_d_idr_colon_69_colon_8_45_35( _arg0, _arg1, _arg2, _arg3, _arg4 ) do
-    {:LiftIO, i_Main_d__lc_tester_Frequency__idr_69_8_69_35_case_lam_52_rc_()}
-  end
-
-  # Main.{tester_Frequency__idr_69_8_69_35_case_lam_52}
-  curry i_Main_d__lc_tester_Frequency__idr_69_8_69_35_case_lam_52_rc_/1
-  def i_Main_d__lc_tester_Frequency__idr_69_8_69_35_case_lam_52_rc_( lift0 ) do
+  # Main.{tester_Main__idr_68_8_68_35_case_lam_52}
+  curry i_Main_d__lc_tester_Main__idr_68_8_68_35_case_lam_52_rc_/1
+  def i_Main_d__lc_tester_Main__idr_68_8_68_35_case_lam_52_rc_( _lift0 ) do
     in6 =
       IO.puts( "Done!\n" )
     {}
   end
 
-  # Main.case block in phone at Frequency.idr:43:8-11
-  curry i_Main_d_case_s_block_s_in_s_phone_s_at_s_Frequency_d_idr_colon_43_colon_8_45_11/7
-  def i_Main_d_case_s_block_s_in_s_phone_s_at_s_Frequency_d_idr_colon_43_colon_8_45_11( arg0, arg1, arg2, _arg3, _arg4, arg5, _arg6 ) do
+  # Main.case block in phone at Main.idr:42:8-11
+  curry i_Main_d_case_s_block_s_in_s_phone_s_at_s_Main_d_idr_colon_42_colon_8_45_11/7
+  def i_Main_d_case_s_block_s_in_s_phone_s_at_s_Main_d_idr_colon_42_colon_8_45_11( arg0, arg1, arg2, _arg3, _arg4, arg5, _arg6 ) do
     aux1 =
       case arg5 do
         {:Freq, in7} ->
-          {:Bind, {:LiftIO, i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_43_rc_().( arg0 ).( in7 )}, i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_48_rc_().( arg1 ).( in7 ).( arg0 ).( arg2 )}
+          {:Bind, {:LiftIO, i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_43_rc_().( arg0 ).( in7 )}, i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_48_rc_().( arg1 ).( in7 ).( arg0 ).( arg2 )}
         _ ->
-          {:Bind, {:LiftIO, i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_49_rc_().( arg0 )}, i_Main_d__lc_phone_11_rc_().( arg0 ).( arg1 ).( arg2 )}
+          {:Bind, {:LiftIO, i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_49_rc_().( arg0 )}, i_Main_d__lc_phone_11_rc_().( arg0 ).( arg1 ).( arg2 )}
       end
     aux1
   end
 
-  # Main.{phone_Frequency__idr_43_8_43_11_case_lam_49}
-  curry i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_49_rc_/2
-  def i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_49_rc_( lift0, lift1 ) do
+  # Main.{phone_Main__idr_42_8_42_11_case_lam_49}
+  curry i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_49_rc_/2
+  def i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_49_rc_( lift0, _lift1 ) do
     in17 =
       IO.puts( "phone " <> lift0 <> " couldn't get frequency!" <> "\n" )
     {}
   end
 
-  # Main.{phone_Frequency__idr_43_8_43_11_case_lam_48}
-  curry i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_48_rc_/5
-  def i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_48_rc_( lift0, lift1, lift2, lift3, _lift4 ) do
-    {:Bind, {:LiftIO, i_ElixirFFI_d_sleep().( 1500 )}, i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_47_rc_().( lift0 ).( lift1 ).( lift2 ).( lift3 )}
+  # Main.{phone_Main__idr_42_8_42_11_case_lam_48}
+  curry i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_48_rc_/5
+  def i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_48_rc_( lift0, lift1, lift2, lift3, _lift4 ) do
+    {:Bind, {:LiftIO, i_IO_d_sleep().( 1500 )}, i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_47_rc_().( lift0 ).( lift1 ).( lift2 ).( lift3 )}
   end
 
-  # Main.{phone_Frequency__idr_43_8_43_11_case_lam_47}
-  curry i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_47_rc_/5
-  def i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_47_rc_( lift0, lift1, lift2, lift3, _lift4 ) do
-    {:Bind, {:Send, lift0, {:RetFreq, lift1}}, i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_46_rc_().( lift2 ).( lift3 )}
+  # Main.{phone_Main__idr_42_8_42_11_case_lam_47}
+  curry i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_47_rc_/5
+  def i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_47_rc_( lift0, lift1, lift2, lift3, _lift4 ) do
+    {:Bind, {:Send, lift0, {:RetFreq, lift1}}, i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_46_rc_().( lift2 ).( lift3 )}
   end
 
-  # Main.{phone_Frequency__idr_43_8_43_11_case_lam_46}
-  curry i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_46_rc_/3
-  def i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_46_rc_( lift0, lift1, _lift2 ) do
-    {:Bind, {:LiftIO, i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_44_rc_().( lift0 )}, i_Main_d__lc_phone_5_rc_().( lift1 )}
+  # Main.{phone_Main__idr_42_8_42_11_case_lam_46}
+  curry i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_46_rc_/3
+  def i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_46_rc_( lift0, lift1, _lift2 ) do
+    {:Bind, {:LiftIO, i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_44_rc_().( lift0 )}, i_Main_d__lc_phone_5_rc_().( lift1 )}
   end
 
-  # Main.{phone_Frequency__idr_43_8_43_11_case_lam_44}
-  curry i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_44_rc_/2
-  def i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_44_rc_( lift0, lift1 ) do
+  # Main.{phone_Main__idr_42_8_42_11_case_lam_44}
+  curry i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_44_rc_/2
+  def i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_44_rc_( lift0, _lift1 ) do
     in14 =
       IO.puts( "phone " <> lift0 <> " has finished calling." <> "\n" )
     {}
   end
 
-  # Main.{phone_Frequency__idr_43_8_43_11_case_lam_43}
-  curry i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_43_rc_/3
-  def i_Main_d__lc_phone_Frequency__idr_43_8_43_11_case_lam_43_rc_( lift0, lift1, lift2 ) do
+  # Main.{phone_Main__idr_42_8_42_11_case_lam_43}
+  curry i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_43_rc_/3
+  def i_Main_d__lc_phone_Main__idr_42_8_42_11_case_lam_43_rc_( lift0, lift1, _lift2 ) do
     aux2 =
       fn ( aux1 ) ->
         i_prim__toStrInt( aux1 )
@@ -101,9 +95,9 @@ defmodule IdrisElixir do
     {}
   end
 
-  # Main.case block in case block in loop at Frequency.idr:27:8 at Frequency.idr:29:12-15
-  curry i_Main_d_case_s_block_s_in_s_case_s_block_s_in_s_loop_s_at_s_Frequency_d_idr_colon_27_colon_8_s_at_s_Frequency_d_idr_colon_29_colon_12_45_15/4
-  def i_Main_d_case_s_block_s_in_s_case_s_block_s_in_s_loop_s_at_s_Frequency_d_idr_colon_27_colon_8_s_at_s_Frequency_d_idr_colon_29_colon_12_45_15( arg0, arg1, _arg2, _arg3 ) do
+  # Main.case block in case block in loop at Main.idr:26:8 at Main.idr:28:12-15
+  curry i_Main_d_case_s_block_s_in_s_case_s_block_s_in_s_loop_s_at_s_Main_d_idr_colon_26_colon_8_s_at_s_Main_d_idr_colon_28_colon_12_45_15/4
+  def i_Main_d_case_s_block_s_in_s_case_s_block_s_in_s_loop_s_at_s_Main_d_idr_colon_26_colon_8_s_at_s_Main_d_idr_colon_28_colon_12_45_15( arg0, arg1, _arg2, _arg3 ) do
     aux1 =
       case arg0 do
         [ in4 | in5 ] ->
@@ -114,9 +108,9 @@ defmodule IdrisElixir do
     aux1
   end
 
-  # Main.case block in loop at Frequency.idr:27:8
-  curry i_Main_d_case_s_block_s_in_s_loop_s_at_s_Frequency_d_idr_colon_27_colon_8/3
-  def i_Main_d_case_s_block_s_in_s_loop_s_at_s_Frequency_d_idr_colon_27_colon_8( arg0, arg1, _arg2 ) do
+  # Main.case block in loop at Main.idr:26:8
+  curry i_Main_d_case_s_block_s_in_s_loop_s_at_s_Main_d_idr_colon_26_colon_8/3
+  def i_Main_d_case_s_block_s_in_s_loop_s_at_s_Main_d_idr_colon_26_colon_8( arg0, arg1, _arg2 ) do
     aux1 =
       case arg1 do
         {:GetFreq, in3} ->
@@ -132,6 +126,12 @@ defmodule IdrisElixir do
           i_Main_d_loop( [ in8 | arg0 ] )
       end
     aux1
+  end
+
+  # case block in io_bind at IO.idr:108:34-36
+  curry i_case_s_block_s_in_s_io_bind_s_at_s_IO_d_idr_colon_108_colon_34_45_36/8
+  def i_case_s_block_s_in_s_io_bind_s_at_s_IO_d_idr_colon_108_colon_34_45_36( _arg0, _arg1, _arg2, _arg3, _arg4, arg5, _arg6, arg7 ) do
+    arg7.( arg5 )
   end
 
   # with block in Prelude.Interfaces.Prelude.Interfaces.Integer implementation of Prelude.Interfaces.Ord, method <
@@ -485,7 +485,7 @@ defmodule IdrisElixir do
 
   # Main.{tester_33}
   curry i_Main_d__lc_tester_33_rc_/1
-  def i_Main_d__lc_tester_33_rc_( lift0 ) do
+  def i_Main_d__lc_tester_33_rc_( _lift0 ) do
     in29 =
       IO.puts( "Done!\n" )
     {}
@@ -549,21 +549,21 @@ defmodule IdrisElixir do
     {:Pure, lift1}
   end
 
-  # ElixirFFI.spawnPtr
-  curry i_ElixirFFI_d_spawnPtr/2
-  def i_ElixirFFI_d_spawnPtr( arg0, _w1 ) do
+  # IO.spawnPtr
+  curry i_IO_d_spawnPtr/2
+  def i_IO_d_spawnPtr( arg0, _w1 ) do
     Idrislib.spawn_idris( arg0 )
   end
 
-  # SafeActors.spawn
-  curry i_SafeActors_d_spawn/3
-  def i_SafeActors_d_spawn( _arg0, _arg1, arg2 ) do
+  # Elixir.SafeActors.spawn
+  curry i_Elixir_d_SafeActors_d_spawn/3
+  def i_Elixir_d_SafeActors_d_spawn( _arg0, _arg1, arg2 ) do
     {:Spawn, arg2}
   end
 
-  # ElixirFFI.sleep
-  curry i_ElixirFFI_d_sleep/2
-  def i_ElixirFFI_d_sleep( arg0, _w1 ) do
+  # IO.sleep
+  curry i_IO_d_sleep/2
+  def i_IO_d_sleep( arg0, _w1 ) do
     :timer.sleep( arg0 )
   end
 
@@ -580,15 +580,15 @@ defmodule IdrisElixir do
     aux1
   end
 
-  # ElixirFFI.sendPtr
-  curry i_ElixirFFI_d_sendPtr/3
-  def i_ElixirFFI_d_sendPtr( arg0, arg1, _w2 ) do
+  # IO.sendPtr
+  curry i_IO_d_sendPtr/3
+  def i_IO_d_sendPtr( arg0, arg1, _w2 ) do
     send( arg0, arg1 )
   end
 
-  # ElixirFFI.selfPtr
-  curry i_ElixirFFI_d_selfPtr/1
-  def i_ElixirFFI_d_selfPtr( _w0 ) do
+  # IO.selfPtr
+  curry i_IO_d_selfPtr/1
+  def i_IO_d_selfPtr( _w0 ) do
     self(  )
   end
 
@@ -598,68 +598,68 @@ defmodule IdrisElixir do
     arg1.( :idris_nothing )
   end
 
-  # SafeActors.runBeh
-  curry i_SafeActors_d_runBeh/3
-  def i_SafeActors_d_runBeh( _arg0, _arg1, arg2 ) do
+  # Elixir.SafeActors.runBeh
+  curry i_Elixir_d_SafeActors_d_runBeh/3
+  def i_Elixir_d_SafeActors_d_runBeh( _arg0, _arg1, arg2 ) do
     aux1 =
       case arg2 do
         {:Bind, in3, in4} ->
-          i_SafeActors_d__lc_runBeh_15_rc_().( in3 ).( in4 )
+          i_Elixir_d_SafeActors_d__lc_runBeh_15_rc_().( in3 ).( in4 )
         {:LiftIO, in7} ->
           in7
         {:Pure, in8} ->
-          i_SafeActors_d__lc_runBeh_16_rc_().( in8 )
+          i_Elixir_d_SafeActors_d__lc_runBeh_16_rc_().( in8 )
         :Recv ->
-          i_SafeActors_d__lc_runBeh_17_rc_()
+          i_Elixir_d_SafeActors_d__lc_runBeh_17_rc_()
         :Self ->
-          i_SafeActors_d__lc_runBeh_18_rc_()
+          i_Elixir_d_SafeActors_d__lc_runBeh_18_rc_()
         {:Send, in14, in15} ->
-          i_ElixirFFI_d_sendPtr().( in14 ).( in15 )
+          i_IO_d_sendPtr().( in14 ).( in15 )
         {:Spawn, in16} ->
-          i_SafeActors_d__lc_runBeh_19_rc_().( in16 )
+          i_Elixir_d_SafeActors_d__lc_runBeh_19_rc_().( in16 )
       end
     aux1
   end
 
-  # SafeActors.{runBeh_19}
-  curry i_SafeActors_d__lc_runBeh_19_rc_/2
-  def i_SafeActors_d__lc_runBeh_19_rc_( lift0, lift1 ) do
+  # Elixir.SafeActors.{runBeh_19}
+  curry i_Elixir_d_SafeActors_d__lc_runBeh_19_rc_/2
+  def i_Elixir_d_SafeActors_d__lc_runBeh_19_rc_( lift0, lift1 ) do
     in18 =
-      i_ElixirFFI_d_spawnPtr( i_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, lift0 ), lift1 )
+      i_IO_d_spawnPtr( i_Elixir_d_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, lift0 ), lift1 )
     in18
   end
 
-  # SafeActors.{runBeh_18}
-  curry i_SafeActors_d__lc_runBeh_18_rc_/1
-  def i_SafeActors_d__lc_runBeh_18_rc_( lift0 ) do
+  # Elixir.SafeActors.{runBeh_18}
+  curry i_Elixir_d_SafeActors_d__lc_runBeh_18_rc_/1
+  def i_Elixir_d_SafeActors_d__lc_runBeh_18_rc_( lift0 ) do
     in13 =
-      i_ElixirFFI_d_selfPtr( lift0 )
+      i_IO_d_selfPtr( lift0 )
     in13
   end
 
-  # SafeActors.{runBeh_17}
-  curry i_SafeActors_d__lc_runBeh_17_rc_/1
-  def i_SafeActors_d__lc_runBeh_17_rc_( lift0 ) do
+  # Elixir.SafeActors.{runBeh_17}
+  curry i_Elixir_d_SafeActors_d__lc_runBeh_17_rc_/1
+  def i_Elixir_d_SafeActors_d__lc_runBeh_17_rc_( lift0 ) do
     in11 =
-      i_ElixirFFI_d_receivePtr( lift0 )
+      i_IO_d_receivePtr( lift0 )
     in11
   end
 
-  # SafeActors.{runBeh_16}
-  curry i_SafeActors_d__lc_runBeh_16_rc_/2
-  def i_SafeActors_d__lc_runBeh_16_rc_( lift0, _lift1 ) do
+  # Elixir.SafeActors.{runBeh_16}
+  curry i_Elixir_d_SafeActors_d__lc_runBeh_16_rc_/2
+  def i_Elixir_d_SafeActors_d__lc_runBeh_16_rc_( lift0, _lift1 ) do
     lift0
   end
 
-  # SafeActors.{runBeh_15}
-  curry i_SafeActors_d__lc_runBeh_15_rc_/3
-  def i_SafeActors_d__lc_runBeh_15_rc_( lift0, lift1, lift2 ) do
+  # Elixir.SafeActors.{runBeh_15}
+  curry i_Elixir_d_SafeActors_d__lc_runBeh_15_rc_/3
+  def i_Elixir_d_SafeActors_d__lc_runBeh_15_rc_( lift0, lift1, lift2 ) do
     aux1 =
-      i_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, lift0 )
+      i_Elixir_d_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, lift0 )
     in6 =
       aux1.( lift2 )
     aux2 =
-      i_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, lift1.( in6 ) )
+      i_Elixir_d_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, lift1.( in6 ) )
     aux2.( lift2 )
   end
 
@@ -678,9 +678,9 @@ defmodule IdrisElixir do
     aux1
   end
 
-  # ElixirFFI.receivePtr
-  curry i_ElixirFFI_d_receivePtr/1
-  def i_ElixirFFI_d_receivePtr( _w0 ) do
+  # IO.receivePtr
+  curry i_IO_d_receivePtr/1
+  def i_IO_d_receivePtr( _w0 ) do
     Idrislib.receive_any(  )
   end
 
@@ -703,7 +703,7 @@ defmodule IdrisElixir do
 
   # prim__writeString
   curry i_prim__writeString/2
-  def i_prim__writeString( arg0, arg1 ) do
+  def i_prim__writeString( _arg0, arg1 ) do
     IO.puts( arg1 )
   end
 
@@ -1107,7 +1107,7 @@ defmodule IdrisElixir do
   # Main.{phone_11}
   curry i_Main_d__lc_phone_11_rc_/4
   def i_Main_d__lc_phone_11_rc_( lift0, lift1, lift2, _lift3 ) do
-    {:Bind, {:LiftIO, i_ElixirFFI_d_sleep().( 1000 )}, i_Main_d__lc_phone_10_rc_().( lift0 ).( lift1 ).( lift2 )}
+    {:Bind, {:LiftIO, i_IO_d_sleep().( 1000 )}, i_Main_d__lc_phone_10_rc_().( lift0 ).( lift1 ).( lift2 )}
   end
 
   # Main.{phone_10}
@@ -1118,7 +1118,7 @@ defmodule IdrisElixir do
 
   # Main.{phone_9}
   curry i_Main_d__lc_phone_9_rc_/2
-  def i_Main_d__lc_phone_9_rc_( lift0, lift1 ) do
+  def i_Main_d__lc_phone_9_rc_( lift0, _lift1 ) do
     in16 =
       IO.puts( "phone " <> lift0 <> " couldn't get frequency!" <> "\n" )
     {}
@@ -1127,7 +1127,7 @@ defmodule IdrisElixir do
   # Main.{phone_8}
   curry i_Main_d__lc_phone_8_rc_/5
   def i_Main_d__lc_phone_8_rc_( lift0, lift1, lift2, lift3, _lift4 ) do
-    {:Bind, {:LiftIO, i_ElixirFFI_d_sleep().( 1500 )}, i_Main_d__lc_phone_7_rc_().( lift0 ).( lift1 ).( lift2 ).( lift3 )}
+    {:Bind, {:LiftIO, i_IO_d_sleep().( 1500 )}, i_Main_d__lc_phone_7_rc_().( lift0 ).( lift1 ).( lift2 ).( lift3 )}
   end
 
   # Main.{phone_7}
@@ -1150,7 +1150,7 @@ defmodule IdrisElixir do
 
   # Main.{phone_4}
   curry i_Main_d__lc_phone_4_rc_/2
-  def i_Main_d__lc_phone_4_rc_( lift0, lift1 ) do
+  def i_Main_d__lc_phone_4_rc_( lift0, _lift1 ) do
     in13 =
       IO.puts( "phone " <> lift0 <> " has finished calling." <> "\n" )
     {}
@@ -1158,7 +1158,7 @@ defmodule IdrisElixir do
 
   # Main.{phone_3}
   curry i_Main_d__lc_phone_3_rc_/3
-  def i_Main_d__lc_phone_3_rc_( lift0, lift1, lift2 ) do
+  def i_Main_d__lc_phone_3_rc_( lift0, lift1, _lift2 ) do
     aux2 =
       fn ( aux1 ) ->
         i_prim__toStrInt( aux1 )
@@ -1190,7 +1190,7 @@ defmodule IdrisElixir do
   def i_Main_d_main(  ) do
     aux1 =
       i_Main_d_tester(  )
-    i_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, aux1 )
+    i_Elixir_d_SafeActors_d_runBeh( :idris_nothing, :idris_nothing, aux1 )
   end
 
   # Main.loop
@@ -1334,5 +1334,3 @@ defmodule IdrisElixir do
     aux1
   end
 end
-
-IdrisElixir.runMain0()

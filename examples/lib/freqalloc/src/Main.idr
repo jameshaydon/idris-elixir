@@ -1,7 +1,6 @@
 module Main
 
-import ElixirFFI
-import SafeActors
+import Elixir.SafeActors
 
 State : Type
 State = List Int

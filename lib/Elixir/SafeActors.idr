@@ -1,6 +1,6 @@
-module SafeActors
+module Elixir.SafeActors
 
-import ElixirFFI
+import public Elixir.IO
 
 %default total
 %access public export
